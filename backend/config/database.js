@@ -17,6 +17,7 @@ module.exports = {
     }
   },
   production: {
+    use_env_variable: process.env.DATABASE_URL ? 'DATABASE_URL' : null,
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,

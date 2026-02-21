@@ -14,7 +14,11 @@
     "docker:down": "docker-compose down",
     "migrate": "node backend/database/migrate.js"
   },
-  "keywords": ["dropshipping", "automation", "e-commerce"],
+  "keywords": [
+    "dropshipping",
+    "automation",
+    "e-commerce"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
@@ -44,5 +48,8 @@
     "nodemon": "^3.0.2",
     "jest": "^29.7.0",
     "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
