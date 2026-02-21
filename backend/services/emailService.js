@@ -255,12 +255,12 @@ const sendEmail = async (to, template, data) => {
         const emailContent = emailTemplates[template](data);
 
         const mailOptions = {
-            from: process.env.EMAIL_FROM || '"Ruthan" <support@ruthan.com>',
+            from: process.env.EMAIL_FROM || '"Ruthan" <ruthanshoppingspot@gmail.com>',
             to,
             subject: emailContent.subject,
             text: emailContent.text,
             html: emailContent.html,
-            replyTo: process.env.EMAIL_REPLY_TO || 'support@ruthan.com'
+            replyTo: process.env.EMAIL_REPLY_TO || 'ruthanshoppingspot@gmail.com'
         };
 
         const info = await transporter.sendMail(mailOptions);

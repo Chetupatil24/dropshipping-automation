@@ -132,7 +132,7 @@ export default function Register() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                                        placeholder="your@email.com"
+                                        placeholder="ruthanshoppingspot@gmail.com"
                                     />
                                 </div>
                             </div>

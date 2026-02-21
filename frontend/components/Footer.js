@@ -89,8 +89,8 @@ export default function Footer() {
                         <ul className="space-y-3 text-gray-400">
                             <li className="flex items-start gap-3">
                                 <FiMail className="text-blue-400 mt-1 flex-shrink-0" />
-                                <a href="mailto:support@ruthan.com" className="hover:text-white transition-colors">
-                                    support@ruthan.com
+                                <a href="mailto:ruthanshoppingspot@gmail.com" className="hover:text-white transition-colors">
+                                    ruthanshoppingspot@gmail.com
                                 </a>
                             </li>
                             <li className="flex items-start gap-3">

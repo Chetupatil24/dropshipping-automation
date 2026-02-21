@@ -64,7 +64,7 @@ export default function Home() {
           </div>
           <div className="flex gap-4">
             <span>📞 Help: +91 98765 43210</span>
-            <span className="hidden md:inline">📧 support@ruthan.com</span>
+            <span className="hidden md:inline">📧 ruthanshoppingspot@gmail.com</span>
           </div>
         </div>
       </div>
@@ -359,7 +359,7 @@ export default function Home() {
               <h4 className="text-white font-bold mb-4">Contact</h4>
               <ul className="space-y-2 text-sm">
                 <li>📞 +91 98765 43210</li>
-                <li>📧 support@ruthan.com</li>
+                <li>📧 ruthanshoppingspot@gmail.com</li>
                 <li>📍 Bangalore, India</li>
                 <li>🕒 24/7 Support</li>
               </ul>
