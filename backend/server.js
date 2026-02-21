@@ -2,6 +2,8 @@ require('dotenv').config();
 
 // Validate environment on startup
 const envValidator = require('./utils/validate-env');
+n// Configure Cloudinary
+const { cloudinary, upload } = require('./config/cloudinary');
 
 const express = require('express');
 const cors = require('cors');
