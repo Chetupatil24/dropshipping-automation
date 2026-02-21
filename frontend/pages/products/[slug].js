@@ -6,6 +6,8 @@ import { useStore } from '../../lib/store';
 import { productsAPI } from '../../lib/api';
 import { toast } from 'react-hot-toast';
 import { FiShoppingCart, FiHeart, FiTruck, FiCheckCircle, FiStar } from 'react-icons/fi';
+import StockScarcityBar from '../../components/StockScarcityBar';
+import ProductBundles from '../../components/ProductBundles';
 
 export default function ProductDetail() {
     const router = useRouter();
@@ -142,6 +144,8 @@ export default function ProductDetail() {
                             </div>
 
                             {/* Features */}
+                            <StockScarcityBar />
+
                             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-8">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex items-center gap-3">
@@ -216,6 +220,8 @@ export default function ProductDetail() {
                                     <span>Easy Returns</span>
                                 </div>
                             </div>
+
+                            <ProductBundles mainProduct={product} />
                         </div>
                     </div>
                 </div>

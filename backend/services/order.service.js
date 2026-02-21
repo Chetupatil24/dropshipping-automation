@@ -226,6 +226,9 @@ class OrderService {
       // Send confirmation email
       await emailService.sendOrderConfirmation(order);
 
+      // Send WhatsApp Notification (Twilio/WATI Integration Placeholder)
+      await this.sendWhatsAppNotification(order);
+
       return order;
     } catch (error) {
       logger.error('Error processing order:', error);
@@ -298,6 +301,39 @@ class OrderService {
       logger.info('Order notification sent:', { orderId: order.id, status: order.status });
     } catch (error) {
       logger.error('Error sending order notification:', error);
+    }
+  }
+
+  // Helper: Send WhatsApp Notification to Customer
+  async sendWhatsAppNotification(order) {
+    try {
+      if (!order.customerPhone) {
+        logger.warn('Skipping WhatsApp notification: No phone number provided for order', { orderId: order.id });
+        return;
+      }
+
+      // TODO: Integrate actual Twilio or WATI API here
+      // const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+      // const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+      // const client = require('twilio')(twilioAccountSid, twilioAuthToken);
+
+      const messageBody = `*Ruthan Shopping Spot*\nHi ${order.user?.firstName || 'Customer'}, your order #${order.orderNumber} for ₹${order.total} has been confirmed! 🎉\nWe will notify you once it ships. Tracking link: https://ruthan.com/track?order=${order.orderNumber}`;
+
+      logger.info('🚀 [WHATSAPP API MOCK] Sending message to:', {
+        phone: order.customerPhone,
+        message: messageBody
+      });
+
+      /* 
+      await client.messages.create({
+         body: messageBody,
+         from: 'whatsapp:+14155238886', // Twilio Sandbox number
+         to: \`whatsapp:\${order.customerPhone}\`
+       }); 
+      */
+
+    } catch (error) {
+      logger.error('Error sending WhatsApp notification:', error);
     }
   }
 

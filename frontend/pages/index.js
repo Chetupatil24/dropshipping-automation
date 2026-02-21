@@ -6,7 +6,7 @@ import { useStore } from '../lib/store';
 import { toast } from 'react-hot-toast';
 import {
   FiShoppingCart, FiUser, FiSearch, FiTruck, FiShield,
-  FiRefreshCw, FiStar, FiMenu, FiHeart, FiMapPin, FiSmartphone, FiHome
+  FiRefreshCw, FiStar, FiMenu, FiHeart, FiMapPin, FiSmartphone, FiHome, FiCheckCircle
 } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -267,6 +267,92 @@ export default function Home() {
                 </div>
               ))
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Customer & Dealer Benefits Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
+
+            {/* Customer Benefits */}
+            <div className="bg-gradient-to-br from-blue-50 to-white p-10 rounded-3xl border border-blue-100 shadow-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+              <h2 className="text-3xl font-extrabold mb-6 text-gray-900 relative z-10 flex items-center gap-3">
+                <span className="text-4xl">🛍️</span> For Our Customers
+              </h2>
+              <ul className="space-y-6 relative z-10">
+                <li className="flex items-start gap-4">
+                  <div className="bg-blue-600 text-white p-2 rounded-full mt-1">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">Live Order Tracking via WhatsApp</h4>
+                    <p className="text-gray-600 mt-1">Get instant updates on your phone exactly when your item ships.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <div className="bg-blue-600 text-white p-2 rounded-full mt-1">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">Curated Product Bundles</h4>
+                    <p className="text-gray-600 mt-1">Save up to 15% when you buy our smart "Frequently Bought Together" recommendations.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <div className="bg-blue-600 text-white p-2 rounded-full mt-1">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">Ultra-Secure Payments</h4>
+                    <p className="text-gray-600 mt-1">100% secure Razorpay checkout, with Cash on Delivery options available.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Dealer Benefits */}
+            <div className="bg-gradient-to-br from-teal-50 to-white p-10 rounded-3xl border border-teal-100 shadow-xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-100 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+              <h2 className="text-3xl font-extrabold mb-6 text-gray-900 relative z-10 flex items-center gap-3">
+                <span className="text-4xl">🤝</span> Become a Dealer
+              </h2>
+              <p className="text-gray-700 mb-8 text-lg relative z-10">
+                Join Ruthan's automated ecosystem and scale your manufacturing or dropshipping business effortlessly.
+              </p>
+              <ul className="space-y-6 relative z-10">
+                <li className="flex items-start gap-4">
+                  <div className="bg-teal-600 text-white p-2 rounded-full mt-1">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">Smart Auto-Routing</h4>
+                    <p className="text-gray-600 mt-1">Orders are automatically sent to your dashboard. No manual emails needed.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <div className="bg-teal-600 text-white p-2 rounded-full mt-1">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">High Volume Sales</h4>
+                    <p className="text-gray-600 mt-1">Tap into our massive customer base driven by live sales triggers and AI urgency.</p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-4">
+                  <div className="bg-teal-600 text-white p-2 rounded-full mt-1">
+                    <FiCheckCircle className="text-xl" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-xl text-gray-900">Next-Day Payouts</h4>
+                    <p className="text-gray-600 mt-1">Get paid instantly upon order fulfillment via our automated wallet system.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
           </div>
         </div>
       </section>
