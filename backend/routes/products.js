@@ -16,19 +16,31 @@ router.get('/', async (req, res, next) => {
 });
 
 // Get single product by ID
-router.get('/:id', async (req, res, next) => {
+// Get product by slug (place before ID route to avoid param collisions)
+router.get('/slug/:slug', async (req, res, next) => {
   try {
-    const product = await productService.getProduct(req.params.id);
+    const product = await productService.getProductBySlug(req.params.slug);
     res.json({ product });
   } catch (error) {
     next(error);
   }
 });
 
-// Get product by slug
-router.get('/slug/:slug', async (req, res, next) => {
+// Check stock (also specific - keep before generic :id route)
+router.get('/:id/stock', async (req, res, next) => {
   try {
-    const product = await productService.getProductBySlug(req.params.slug);
+    const { quantity = 1 } = req.query;
+    const result = await productService.checkStock(req.params.id, parseInt(quantity));
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get single product by ID (generic param route - keep after specific routes)
+router.get('/:id', async (req, res, next) => {
+  try {
+    const product = await productService.getProduct(req.params.id);
     res.json({ product });
   } catch (error) {
     next(error);
@@ -65,15 +77,6 @@ router.delete('/:id', auth, adminAuth, async (req, res, next) => {
   }
 });
 
-// Check stock
-router.get('/:id/stock', async (req, res, next) => {
-  try {
-    const { quantity = 1 } = req.query;
-    const result = await productService.checkStock(req.params.id, parseInt(quantity));
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+// (moved above to avoid route capture by '/:id')
 
 module.exports = router;

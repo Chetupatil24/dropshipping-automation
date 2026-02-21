@@ -288,6 +288,31 @@ vercel --prod
 
 ---
 
+### Railway (monorepo)
+
+Railway can run this monorepo by using the root `railway.json` build configuration and a `Procfile` to declare processes. Add the required environment variables (Postgres, Redis, JWT_SECRET, provider keys) in the Railway project settings.
+
+- Ensure the root `start` script launches the backend (`node backend/server.js`) — this repo already uses `npm start`.
+- Railway will run the root build; the `Procfile` contains process entries:
+    - `web`: backend API
+    - `worker`: background job worker
+    - `frontend`: builds and serves the Next.js storefront
+    - `admin`: builds and serves the admin Next.js app
+
+Basic steps:
+
+1. Create a new Railway project and connect your GitHub repo.
+2. In Railway, add a Postgres plugin and a Redis plugin (or external providers) and copy credentials to project environment variables.
+3. In Railway project settings, add all required env vars from `.env.example` (at minimum: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `REDIS_HOST`, `REDIS_PORT`).
+4. Deploy — Railway will run the Nixpacks build and then start process types from `Procfile`.
+
+Notes:
+- If you prefer to host the frontend separately (Vercel), remove `frontend` and `admin` entries from the `Procfile` and deploy those apps independently.
+- If builds fail due to missing `NODE_ENV` or build-time envs, add those variables to Railway's build environment.
+
+
+---
+
 ## Production Checklist
 
 ### Security
