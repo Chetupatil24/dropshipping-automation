@@ -51,11 +51,11 @@ export default function Register() {
                 <title>Create Account - Ruthan | The Shopping Spot</title>
             </Head>
 
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 py-12 px-4 relative overflow-hidden">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 py-12 px-4 relative overflow-hidden">
                 {/* Animated background orbs */}
                 <div className="absolute inset-0">
                     <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-float"></div>
-                    <div className="absolute bottom-20 right-20 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-20 right-20 w-72 h-72 bg-teal-300/20 rounded-full blur-3xl"></div>
                 </div>
 
                 <div className="max-w-md w-full relative z-10">
@@ -64,8 +64,8 @@ export default function Register() {
                         {/* Logo */}
                         <div className="text-center mb-8">
                             <Link href="/" className="inline-block">
-                                <h1 className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent hover:scale-105 transition-transform">
-                                    <span className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+                                <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent hover:scale-105 transition-transform">
+                                    <span className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-blue-700 to-purple-900 bg-clip-text text-transparent">
                                         RUTHAN
                                     </span>
                                     <span className="text-sm text-gray-500 italic">The Shopping Spot</span>
@@ -94,7 +94,7 @@ export default function Register() {
                                         required
                                         value={formData.firstName}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         placeholder="John"
                                     />
                                 </div>
@@ -109,7 +109,7 @@ export default function Register() {
                                         required
                                         value={formData.lastName}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         placeholder="Doe"
                                     />
                                 </div>
@@ -122,7 +122,7 @@ export default function Register() {
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FiMail className="text-purple-500 text-xl" />
+                                        <FiMail className="text-blue-600 text-xl" />
                                     </div>
                                     <input
                                         id="email"
@@ -131,7 +131,7 @@ export default function Register() {
                                         required
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         placeholder="your@email.com"
                                     />
                                 </div>
@@ -144,7 +144,7 @@ export default function Register() {
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FiLock className="text-purple-500 text-xl" />
+                                        <FiLock className="text-blue-600 text-xl" />
                                     </div>
                                     <input
                                         id="password"
@@ -153,7 +153,7 @@ export default function Register() {
                                         required
                                         value={formData.password}
                                         onChange={handleChange}
-                                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -166,7 +166,7 @@ export default function Register() {
                                 </label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <FiLock className="text-purple-500 text-xl" />
+                                        <FiLock className="text-blue-600 text-xl" />
                                     </div>
                                     <input
                                         id="confirmPassword"
@@ -175,7 +175,7 @@ export default function Register() {
                                         required
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
-                                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                                        className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -185,7 +185,7 @@ export default function Register() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-4 rounded-full font-extrabold text-lg hover:from-purple-700 hover:to-pink-600 transition-all hover:scale-105 shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
+                                className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-full font-extrabold text-lg hover:from-teal-600 hover:to-secondary transition-all hover:scale-105 shadow-xl flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
                             >
                                 {loading ? 'Creating Account...' : (
                                     <>
@@ -198,7 +198,7 @@ export default function Register() {
                             <div className="text-center mt-6">
                                 <p className="text-gray-600">
                                     Already have an account?{' '}
-                                    <Link href="/login" className="font-bold text-purple-600 hover:text-pink-500 transition-colors">
+                                    <Link href="/login" className="font-bold text-blue-700 hover:text-teal-500 transition-colors">
                                         Sign In
                                     </Link>
                                 </p>

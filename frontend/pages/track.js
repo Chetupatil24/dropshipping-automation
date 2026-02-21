@@ -65,7 +65,7 @@ export default function TrackOrder() {
         switch (status) {
             case 'delivered': return <FiCheckCircle className="text-green-500" />;
             case 'shipped':
-            case 'out_for_delivery': return <FiTruck className="text-purple-500" />;
+            case 'out_for_delivery': return <FiTruck className="text-blue-600" />;
             case 'processing': return <FiClock className="text-blue-500" />;
             default: return <FiPackage className="text-gray-500" />;
         }
@@ -102,7 +102,7 @@ export default function TrackOrder() {
 
             <div className="min-h-screen bg-gradient-to-b from-purple-50 via-pink-50 to-white">
                 {/* Header */}
-                <header className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 shadow-lg py-6">
+                <header className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-800 shadow-lg py-6">
                     <div className="container mx-auto px-4">
                         <Link href="/" className="flex flex-col">
                             <span className="text-3xl font-extrabold text-white tracking-tight">RUTHAN</span>
@@ -114,7 +114,7 @@ export default function TrackOrder() {
                 <div className="container mx-auto px-4 py-12 max-w-4xl">
                     {/* Page Header */}
                     <div className="text-center mb-12">
-                        <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                        <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                             Track Your Order
                         </h1>
                         <p className="text-gray-600 text-lg">Enter your order number to see real-time tracking</p>
@@ -134,7 +134,7 @@ export default function TrackOrder() {
                             <button
                                 onClick={() => fetchTracking(orderNumber)}
                                 disabled={loading}
-                                className="bg-gradient-to-r from-purple-600 to-pink-500 text-white px-10 py-4 rounded-full font-extrabold hover:from-purple-700 hover:to-pink-600 transition-all disabled:opacity-50 flex items-center gap-2"
+                                className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-10 py-4 rounded-full font-extrabold hover:from-teal-600 hover:to-secondary transition-all disabled:opacity-50 flex items-center gap-2"
                            >
                                 {loading ? (
                                     <>
@@ -155,7 +155,7 @@ export default function TrackOrder() {
                     {tracking && (
                         <div className="space-y-6">
                             {/* Status Card */}
-                            <div className="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-2xl p-8 text-white shadow-2xl">
+                            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 rounded-2xl p-8 text-white shadow-2xl">
                                 <div className="flex items-center justify-between mb-6">
                                     <div>
                                         <p className="text-sm opacity-90">Order Number</p>
@@ -234,7 +234,7 @@ export default function TrackOrder() {
                                             href={tracking.trackingUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="w-full block text-center bg-white text-purple-600 px-6 py-3 rounded-full font-bold hover:scale-105 transition-all"
+                                            className="w-full block text-center bg-white text-blue-700 px-6 py-3 rounded-full font-bold hover:scale-105 transition-all"
                                        >
                                             Track on {tracking.carrier} Website →
                                         </a>
@@ -259,7 +259,7 @@ export default function TrackOrder() {
                             {tracking.history && tracking.history.length> 0 && (
                                 <div className="bg-white rounded-2xl shadow-lg p-8">
                                     <h3 className="text-2xl font-extrabold mb-6 flex items-center gap-2">
-                                        <FiTruck className="text-purple-600" />
+                                        <FiTruck className="text-blue-700" />
                                         Tracking Timeline
                                     </h3>
                                     <div className="space-y-4">

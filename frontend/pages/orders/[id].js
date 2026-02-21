@@ -79,12 +79,12 @@ export default function OrderDetail() {
                 <div className="container mx-auto px-4 max-w-6xl">
                     {/* Header */}
                     <div className="mb-8">
-                        <Link href="/orders" className="text-purple-600 hover:text-purple-700 mb-4 inline-flex items-center gap-2">
+                        <Link href="/orders" className="text-blue-700 hover:text-purple-700 mb-4 inline-flex items-center gap-2">
                             ← Back to Orders
                         </Link>
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                     Order #{order.id}
                                 </h1>
                                 <p className="text-gray-600">
@@ -95,7 +95,7 @@ export default function OrderDetail() {
                                     })}
                                 </p>
                             </div>
-                            <button className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-purple-200 text-purple-600 rounded-full font-bold hover:bg-purple-50 transition-all">
+                            <button className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-purple-200 text-blue-700 rounded-full font-bold hover:bg-purple-50 transition-all">
                                 <FiDownload />
                                 Invoice
                             </button>
@@ -109,7 +109,7 @@ export default function OrderDetail() {
                             {/* Progress Line */}
                             <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200">
                                 <div
-                                    className="h-full bg-gradient-to-r from-purple-600 to-pink-500 transition-all duration-500"
+                                    className="h-full bg-gradient-to-r from-blue-600 to-teal-600 transition-all duration-500"
                                     style={{ width: `${(steps.filter(s => s.completed).length - 1) * 33.33}%` }}
                                 ></div>
                             </div>
@@ -119,12 +119,12 @@ export default function OrderDetail() {
                                 {steps.map((step, index) => (
                                     <div key={step.key} className="flex flex-col items-center">
                                         <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-all ${step.completed
-                                                ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white scale-110'
+                                                ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white scale-110'
                                                 : 'bg-gray-200 text-gray-400'
                                             }`}>
                                             <step.icon className="text-xl" />
                                         </div>
-                                        <p className={`text-sm font-bold text-center ${step.completed ? 'text-purple-600' : 'text-gray-400'
+                                        <p className={`text-sm font-bold text-center ${step.completed ? 'text-blue-700' : 'text-gray-400'
                                             }`}>
                                             {step.label}
                                         </p>
@@ -146,7 +146,7 @@ export default function OrderDetail() {
                                         <p className="text-sm text-gray-600 mb-1">Tracking Number</p>
                                         <p className="text-2xl font-extrabold text-yellow-900 tracking-wider">{order.trackingNumber}</p>
                                     </div>
-                                    <button className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full font-bold hover:from-purple-700 hover:to-pink-600 transition-all">
+                                    <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-full font-bold hover:from-teal-600 hover:to-secondary transition-all">
                                         Track Package
                                     </button>
                                 </div>
@@ -177,7 +177,7 @@ export default function OrderDetail() {
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-sm text-gray-600">Price</p>
-                                                <p className="text-xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                                <p className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                                     ₹{item.price}
                                                 </p>
                                             </div>
@@ -190,7 +190,7 @@ export default function OrderDetail() {
                         {/* Order Summary & Details */}
                         <div className="lg:col-span-1 space-y-6">
                             {/* Summary */}
-                            <div className="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-2xl p-6 shadow-2xl text-white">
+                            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 rounded-2xl p-6 shadow-2xl text-white">
                                 <h2 className="text-2xl font-extrabold mb-4">Order Summary</h2>
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
@@ -215,7 +215,7 @@ export default function OrderDetail() {
                             {/* Shipping Address */}
                             <div className="bg-white rounded-2xl shadow-lg p-6">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-2 rounded-full">
+                                    <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-2 rounded-full">
                                         <FiMapPin className="text-white text-xl" />
                                     </div>
                                     <h3 className="text-xl font-extrabold">Shipping Address</h3>
@@ -232,7 +232,7 @@ export default function OrderDetail() {
                             {/* Payment Info */}
                             <div className="bg-white rounded-2xl shadow-lg p-6">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-2 rounded-full">
+                                    <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-2 rounded-full">
                                         <FiCreditCard className="text-white text-xl" />
                                     </div>
                                     <h3 className="text-xl font-extrabold">Payment Method</h3>

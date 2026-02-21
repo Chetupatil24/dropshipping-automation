@@ -59,7 +59,7 @@ export default function Account() {
                 <div className="container mx-auto px-4 max-w-6xl">
                     {/* Header */}
                     <div className="text-center mb-12">
-                        <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                        <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                             My Account
                         </h1>
                         <p className="text-gray-600">Manage your Ruthan profile and orders</p>
@@ -70,7 +70,7 @@ export default function Account() {
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
                                 <div className="text-center mb-6">
-                                    <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-pink-500 rounded-full mx-auto flex items-center justify-center text-white text-3xl font-bold mb-4">
+                                    <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-teal-600 rounded-full mx-auto flex items-center justify-center text-white text-3xl font-bold mb-4">
                                         {user.firstName?.[0]}{user.lastName?.[0]}
                                     </div>
                                     <h2 className="text-2xl font-bold">{user.firstName} {user.lastName}</h2>
@@ -109,7 +109,7 @@ export default function Account() {
                                     {!editing && (
                                         <button
                                             onClick={() => setEditing(true)}
-                                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full font-bold hover:from-purple-700 hover:to-pink-600 transition-all"
+                                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-full font-bold hover:from-teal-600 hover:to-secondary transition-all"
                                         >
                                             <FiEdit />
                                             Edit
@@ -167,7 +167,7 @@ export default function Account() {
                                         <div className="flex gap-4">
                                             <button
                                                 type="submit"
-                                                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-4 rounded-full font-extrabold hover:from-purple-700 hover:to-pink-600 transition-all"
+                                                className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-full font-extrabold hover:from-teal-600 hover:to-secondary transition-all"
                                             >
                                                 Save Changes
                                             </button>
@@ -184,7 +184,7 @@ export default function Account() {
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
                                             <div className="bg-white p-3 rounded-full">
-                                                <FiUser className="text-purple-600 text-xl" />
+                                                <FiUser className="text-blue-700 text-xl" />
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-600">Name</p>
@@ -194,7 +194,7 @@ export default function Account() {
 
                                         <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
                                             <div className="bg-white p-3 rounded-full">
-                                                <FiMail className="text-purple-600 text-xl" />
+                                                <FiMail className="text-blue-700 text-xl" />
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-600">Email</p>
@@ -204,7 +204,7 @@ export default function Account() {
 
                                         <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
                                             <div className="bg-white p-3 rounded-full">
-                                                <FiPhone className="text-purple-600 text-xl" />
+                                                <FiPhone className="text-blue-700 text-xl" />
                                             </div>
                                             <div>
                                                 <p className="text-sm text-gray-600">Phone</p>
@@ -217,19 +217,19 @@ export default function Account() {
                                 {/* Stats */}
                                 <div className="grid grid-cols-3 gap-4 mt-8 pt-8 border-t-2 border-gray-100">
                                     <div className="text-center">
-                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                             0
                                         </div>
                                         <p className="text-sm text-gray-600 mt-1">Total Orders</p>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                             ₹0
                                         </div>
                                         <p className="text-sm text-gray-600 mt-1">Total Spent</p>
                                     </div>
                                     <div className="text-center">
-                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                             0
                                         </div>
                                         <p className="text-sm text-gray-600 mt-1">Wishlist Items</p>

@@ -148,7 +148,7 @@ export default function Checkout() {
 
             <div className="min-h-screen bg-gradient-to-b from-purple-50 via-pink-50 to-white py-12">
                 <div className="container mx-auto px-4">
-                    <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent text-center">
+                    <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent text-center">
                         Secure Checkout
                     </h1>
                     <p className="text-gray-600 mb-12 text-center">Complete your order in just a few steps</p>
@@ -160,7 +160,7 @@ export default function Checkout() {
                                 {/* Shipping Address */}
                                 <div className="bg-white rounded-2xl shadow-lg p-8">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-3 rounded-full">
+                                        <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-3 rounded-full">
                                             <FiMapPin className="text-white text-2xl" />
                                         </div>
                                         <h2 className="text-2xl font-extrabold">Shipping Address</h2>
@@ -263,7 +263,7 @@ export default function Checkout() {
                                 {/* Payment Method */}
                                 <div className="bg-white rounded-2xl shadow-lg p-8">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-3 rounded-full">
+                                        <div className="bg-gradient-to-r from-blue-600 to-teal-600 p-3 rounded-full">
                                             <FiCreditCard className="text-white text-2xl" />
                                         </div>
                                         <h2 className="text-2xl font-extrabold">Payment Method</h2>
@@ -306,7 +306,7 @@ export default function Checkout() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-5 rounded-full font-extrabold text-xl hover:from-purple-700 hover:to-pink-600 transition-all hover:scale-105 shadow-2xl disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-5 rounded-full font-extrabold text-xl hover:from-teal-600 hover:to-secondary transition-all hover:scale-105 shadow-2xl disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     <FiLock />
                                     {loading ? 'Processing...' : `Place Order - ₹${total.toFixed(2)}`}
@@ -316,7 +316,7 @@ export default function Checkout() {
 
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
-                            <div className="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-2xl p-8 shadow-2xl sticky top-4 text-white">
+                            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 rounded-2xl p-8 shadow-2xl sticky top-4 text-white">
                                 <h2 className="text-3xl font-extrabold mb-6">Order Summary</h2>
 
                                 {/* Cart Items */}

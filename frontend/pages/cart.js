@@ -93,11 +93,11 @@ export default function Cart() {
                     <div className="flex-1">
                       <Link
                         href={`/products/${item.slug}`}
-                        className="font-bold text-xl hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-500 transition-all"
+                        className="font-bold text-xl hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-blue-600 hover:to-teal-600 transition-all"
                       >
                         {item.name}
                       </Link>
-                      <p className="text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mt-2">
+                      <p className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mt-2">
                         ₹{item.price}
                       </p>
                     </div>
@@ -119,7 +119,7 @@ export default function Cart() {
                         </button>
                       </div>
 
-                      <div className="font-extrabold text-2xl w-28 text-right bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                      <div className="font-extrabold text-2xl w-28 text-right bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                         ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
                       </div>
 
@@ -137,7 +137,7 @@ export default function Cart() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 rounded-2xl p-8 shadow-2xl sticky top-4 text-white">
+              <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 rounded-2xl p-8 shadow-2xl sticky top-4 text-white">
                 <h2 className="text-3xl font-extrabold mb-6">Order Summary</h2>
 
                 <div className="space-y-4 mb-6">

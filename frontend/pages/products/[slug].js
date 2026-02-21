@@ -67,7 +67,7 @@ export default function ProductDetail() {
                 <div className="container mx-auto px-4">
                     {/* Breadcrumb */}
                     <div className="mb-8 text-sm text-gray-600">
-                        <Link href="/" className="hover:text-purple-600">Home</Link>
+                        <Link href="/" className="hover:text-blue-700">Home</Link>
                         <span className="mx-2">/</span>
                         <span className="text-gray-900 font-medium">{product.name}</span>
                     </div>
@@ -104,7 +104,7 @@ export default function ProductDetail() {
                         {/* Product Info */}
                         <div>
                             {/* Title */}
-                            <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                            <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                 {product.name}
                             </h1>
 
@@ -121,7 +121,7 @@ export default function ProductDetail() {
                             {/* Price */}
                             <div className="mb-8">
                                 <div className="flex items-baseline gap-4">
-                                    <span className="text-5xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                    <span className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                         ₹{product.price}
                                     </span>
                                     {product.compareAtPrice && (
@@ -145,14 +145,14 @@ export default function ProductDetail() {
                             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 mb-8">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="flex items-center gap-3">
-                                        <FiTruck className="text-purple-600 text-2xl" />
+                                        <FiTruck className="text-blue-700 text-2xl" />
                                         <div>
                                             <p className="font-bold">Fast Delivery</p>
                                             <p className="text-sm text-gray-600">3-5 days</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <FiCheckCircle className="text-purple-600 text-2xl" />
+                                        <FiCheckCircle className="text-blue-700 text-2xl" />
                                         <div>
                                             <p className="font-bold">COD Available</p>
                                             <p className="text-sm text-gray-600">Pay on delivery</p>
@@ -168,14 +168,14 @@ export default function ProductDetail() {
                                     <div className="flex items-center bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-purple-200 rounded-full overflow-hidden">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="px-6 py-3 hover:bg-purple-100 transition-colors font-bold text-purple-600 text-xl"
+                                            className="px-6 py-3 hover:bg-purple-100 transition-colors font-bold text-blue-700 text-xl"
                                         >
                                             -
                                         </button>
                                         <span className="px-8 py-3 font-bold text-purple-900 text-xl">{quantity}</span>
                                         <button
                                             onClick={() => setQuantity(quantity + 1)}
-                                            className="px-6 py-3 hover:bg-purple-100 transition-colors font-bold text-purple-600 text-xl"
+                                            className="px-6 py-3 hover:bg-purple-100 transition-colors font-bold text-blue-700 text-xl"
                                         >
                                             +
                                         </button>
@@ -191,12 +191,12 @@ export default function ProductDetail() {
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={product.stock <= 0}
-                                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-5 rounded-full font-extrabold text-xl hover:from-purple-700 hover:to-pink-600 transition-all hover:scale-105 shadow-2xl disabled:opacity-50 flex items-center justify-center gap-3"
+                                    className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-5 rounded-full font-extrabold text-xl hover:from-teal-600 hover:to-secondary transition-all hover:scale-105 shadow-2xl disabled:opacity-50 flex items-center justify-center gap-3"
                                 >
                                     <FiShoppingCart className="text-2xl" />
                                     {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
                                 </button>
-                                <button className="bg-white border-2 border-purple-200 text-purple-600 px-6 py-5 rounded-full font-bold hover:bg-purple-50 transition-all hover:scale-105 shadow-lg">
+                                <button className="bg-white border-2 border-purple-200 text-blue-700 px-6 py-5 rounded-full font-bold hover:bg-purple-50 transition-all hover:scale-105 shadow-lg">
                                     <FiHeart className="text-2xl" />
                                 </button>
                             </div>

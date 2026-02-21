@@ -37,7 +37,7 @@ export default function Orders() {
         switch (status) {
             case 'pending': return <FiClock className="text-yellow-500" />;
             case 'processing': return <FiPackage className="text-blue-500" />;
-            case 'shipped': return <FiTruck className="text-purple-500" />;
+            case 'shipped': return <FiTruck className="text-blue-600" />;
             case 'delivered': return <FiCheckCircle className="text-green-500" />;
             case 'cancelled': return <FiXCircle className="text-red-500" />;
             default: return <FiPackage className="text-gray-500" />;
@@ -72,10 +72,10 @@ export default function Orders() {
                 <div className="container mx-auto px-4 max-w-6xl">
                     {/* Header */}
                     <div className="mb-12">
-                        <Link href="/account" className="text-purple-600 hover:text-purple-700 mb-4 inline-flex items-center gap-2">
+                        <Link href="/account" className="text-blue-700 hover:text-purple-700 mb-4 inline-flex items-center gap-2">
                             ← Back to Account
                         </Link>
-                        <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                        <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                             My Orders
                         </h1>
                         <p className="text-gray-600">Track and manage your Ruthan orders</p>
@@ -93,7 +93,7 @@ export default function Orders() {
                                 key={key}
                                 onClick={() => setFilter(key)}
                                 className={`px-6 py-3 rounded-full font-bold whitespace-nowrap transition-all ${filter === key
-                                    ? 'bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-lg scale-105'
+                                    ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg scale-105'
                                     : 'bg-white text-gray-600 hover:bg-gray-50 border-2 border-gray-200'
                                     }`}
                             >
@@ -111,13 +111,13 @@ export default function Orders() {
                     ) : filteredOrders.length === 0 ? (
                         <div className="text-center py-20">
                             <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <FiPackage className="text-6xl text-purple-600" />
+                                <FiPackage className="text-6xl text-blue-700" />
                             </div>
-                            <h2 className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                            <h2 className="text-3xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                 No Orders Yet
                             </h2>
                             <p className="text-gray-600 mb-8">Start shopping to see your orders here!</p>
-                            <Link href="/" className="inline-block bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-4 rounded-full font-bold hover:from-purple-700 hover:to-pink-600 transition-all">
+                            <Link href="/" className="inline-block bg-gradient-to-r from-blue-600 to-teal-600 text-white px-8 py-4 rounded-full font-bold hover:from-teal-600 hover:to-secondary transition-all">
                                 Start Shopping
                             </Link>
                         </div>
@@ -144,7 +144,7 @@ export default function Orders() {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-gray-600">Total</p>
-                                            <p className="text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                                            <p className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                                                 ₹{order.total}
                                             </p>
                                         </div>
@@ -185,13 +185,13 @@ export default function Orders() {
                                         <div className="flex gap-4">
                                             <Link
                                                 href={`/orders/${order.id}`}
-                                                className="flex-1 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-6 py-3 rounded-full font-bold hover:from-purple-700 hover:to-pink-600 transition-all text-center flex items-center justify-center gap-2"
+                                                className="flex-1 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-3 rounded-full font-bold hover:from-teal-600 hover:to-secondary transition-all text-center flex items-center justify-center gap-2"
                                             >
                                                 View Details
                                                 <FiArrowRight />
                                             </Link>
                                             {order.status === 'delivered' && (
-                                                <button className="px-6 py-3 border-2 border-purple-200 text-purple-600 rounded-full font-bold hover:bg-purple-50 transition-all">
+                                                <button className="px-6 py-3 border-2 border-purple-200 text-blue-700 rounded-full font-bold hover:bg-purple-50 transition-all">
                                                     Reorder
                                                 </button>
                                             )}
