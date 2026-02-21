@@ -2,10 +2,19 @@
 nixPkgs = ["nodejs-18_x"]
 
 [phases.install]
-cmds = ["npm ci --production=false", "cd frontend && npm ci --production=false"]
+cmds = [
+  "npm install -g npm@10",
+  "npm config set fetch-retries 5",
+  "npm config set fetch-retry-mintimeout 20000",
+  "npm config set fetch-retry-maxtimeout 120000",
+  "npm install --legacy-peer-deps --no-audit --no-fund --maxsockets=3",
+  "cd frontend && npm install --legacy-peer-deps --no-audit --no-fund --maxsockets=3"
+]
 
 [phases.build]
-cmds = ["cd frontend && npm run build"]
+cmds = [
+  "cd frontend && NODE_OPTIONS='--max_old_space_size=1024' npm run build"
+]
 
 [start]
 cmd = "npm start"
