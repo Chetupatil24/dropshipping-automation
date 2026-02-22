@@ -1,10 +1,4 @@
-You need to authenticate with Cloudflare Wrangler to deploy.
-1. Run: npx wrangler login
-2. This will open a browser window for you to allow Wrangler to access your Cloudflare account.
-3. Once authenticated locally, run:
-   npx wrangler secret put SUPABASE_URL (paste: https://ccwnnradnszbwjfjfpvk.supabase.co)
-   npx wrangler secret put SUPABASE_KEY (paste: REDACTED_SUPABASE_KEY)
-   npx wrangler secret put CLOUDINARY_CLOUD_NAME (paste: dfgn2etwj)
-   npx wrangler secret put CLOUDINARY_API_KEY (paste: 763814895541787)
-   npx wrangler secret put CLOUDINARY_API_SECRET (paste: REDACTED_CLOUDINARY_SECRET)
-4. Finally, run: npx wrangler deploy
+You have successfully authenticated with Cloudflare and your backend is now deployed!
+
+To view your API, go to your Cloudflare Dashboard and look under "Workers & Pages".
+Or visit the URL provided in the terminal output above.
