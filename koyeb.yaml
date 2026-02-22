@@ -1,0 +1,19 @@
+project: ruthan-dropshipping
+services:
+  - name: ruthan-backend-api
+    github:
+      repository: Chetupatil24/dropshipping-automation
+      branch: main
+      workdir: backend
+      build_command: npm install
+      run_command: node server.js
+    ports:
+      - port: 8080
+        protocol: http
+    env:
+      - NODE_ENV: production
+      - PORT: 8080
+      - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+    instance_type: free
+    regions:
+      - was
