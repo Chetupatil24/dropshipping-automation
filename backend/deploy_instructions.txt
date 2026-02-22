@@ -1,4 +1,0 @@
-You have successfully authenticated with Cloudflare and your backend is now deployed!
-
-To view your API, go to your Cloudflare Dashboard and look under "Workers & Pages".
-Or visit the URL provided in the terminal output above.
