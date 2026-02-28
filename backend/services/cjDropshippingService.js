@@ -1,5 +1,28 @@
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const logger = require('../utils/logger');
+
+// File-based token cache so token survives across process restarts
+const TOKEN_CACHE_FILE = path.join(require('os').tmpdir(), 'cj_token_cache.json');
+
+function loadCachedToken() {
+    try {
+        if (fs.existsSync(TOKEN_CACHE_FILE)) {
+            const data = JSON.parse(fs.readFileSync(TOKEN_CACHE_FILE, 'utf8'));
+            if (data.accessToken && data.tokenExpiry && new Date() < new Date(data.tokenExpiry)) {
+                return data;
+            }
+        }
+    } catch (_) {}
+    return null;
+}
+
+function saveCachedToken(accessToken, tokenExpiry) {
+    try {
+        fs.writeFileSync(TOKEN_CACHE_FILE, JSON.stringify({ accessToken, tokenExpiry }), 'utf8');
+    } catch (_) {}
+}
 
 class CJDropshippingService {
     constructor() {
@@ -7,8 +30,10 @@ class CJDropshippingService {
         this.password = process.env.CJ_DROPSHIP_PASSWORD;
         this.apiKey = process.env.CJ_API_KEY;
         this.baseUrl = 'https://developers.cjdropshipping.com/api2.0/v1';
-        this.accessToken = null;
-        this.tokenExpiry = null;
+        // Load from file cache first
+        const cached = loadCachedToken();
+        this.accessToken = cached ? cached.accessToken : null;
+        this.tokenExpiry = cached ? new Date(cached.tokenExpiry) : null;
     }
 
     /**
@@ -30,17 +55,25 @@ class CJDropshippingService {
             if (response.data && response.data.result && response.data.data) {
                 this.accessToken = response.data.data.accessToken;
                 this.tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1000);
+                // Persist token to file so next process run reuses it
+                saveCachedToken(this.accessToken, this.tokenExpiry);
                 logger.info('CJ Dropshipping: Access token obtained successfully');
                 return this.accessToken;
             } else {
                 throw new Error(response.data?.message || 'Failed to get access token');
             }
         } catch (error) {
+            const responseData = error.response?.data;
+            // If rate-limited but we have an old token, keep using it
+            if (responseData?.code === 1600200 && this.accessToken) {
+                logger.warn('CJ auth rate-limited (429), reusing existing token');
+                return this.accessToken;
+            }
             logger.error('CJ authentication failed', {
                 error: error.message,
-                response: error.response?.data
+                response: responseData
             });
-            throw new Error(`CJ Authentication failed: ${error.response?.data?.message || error.message}`);
+            throw new Error(`CJ Authentication failed: ${responseData?.message || error.message}`);
         }
     }
 
