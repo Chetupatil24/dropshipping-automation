@@ -5,6 +5,7 @@ class CJDropshippingService {
     constructor() {
         this.email = process.env.CJ_DROPSHIP_EMAIL;
         this.password = process.env.CJ_DROPSHIP_PASSWORD;
+        this.apiKey = process.env.CJ_API_KEY;
         this.baseUrl = 'https://developers.cjdropshipping.com/api2.0/v1';
         this.accessToken = null;
         this.tokenExpiry = null;
@@ -16,6 +17,28 @@ class CJDropshippingService {
     async getAccessToken() {
         // Return cached token if still valid
         if (this.accessToken && this.tokenExpiry && new Date() < this.tokenExpiry) {
+            return this.accessToken;
+        }
+
+        // Try direct API key first (CJ provides API keys that work as access tokens)
+        if (this.apiKey) {
+            try {
+                const response = await axios.get(`${this.baseUrl}/authentication/getAccessToken`, {
+                    headers: { 'CJ-Access-Token': this.apiKey }
+                });
+                if (response.data && response.data.result) {
+                    this.accessToken = this.apiKey;
+                    this.tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1000);
+                    logger.info('CJ Dropshipping: Using API key as access token');
+                    return this.accessToken;
+                }
+            } catch (e) {
+                // fall through to email/password
+            }
+
+            // Use API key directly as token
+            this.accessToken = this.apiKey;
+            this.tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1000);
             return this.accessToken;
         }
 
