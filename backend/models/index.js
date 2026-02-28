@@ -26,7 +26,9 @@ OrderTrackingHistory.belongsTo(Order, { foreignKey: 'orderId', as: 'order' });
 // Sync database
 const syncDatabase = async (force = false) => {
   try {
-    await sequelize.sync({ force, alter: !force });
+    // alter: { drop: false } adds new columns/tables but never drops existing columns
+    // This prevents conflicts with Supabase RLS policies that depend on DB columns
+    await sequelize.sync({ force, alter: force ? false : { drop: false } });
     console.log('Database synced successfully');
   } catch (error) {
     console.error('Error syncing database:', error);
