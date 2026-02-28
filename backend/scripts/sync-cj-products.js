@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 const { Product, Supplier } = require('../models');
 const cjDropshippingService = require('../services/cjDropshippingService');
 const logger = require('../utils/logger');
