@@ -183,7 +183,7 @@ class CJDropshippingService {
                 pageNum: params.page || 1,
                 pageSize: params.pageSize || 50,
                 categoryId: params.categoryId
-            });
+            }, 'GET');
 
             const products = response.data?.list || [];
             logger.info(`Retrieved ${products.length} products from CJ Dropshipping`);
@@ -192,7 +192,6 @@ class CJDropshippingService {
             logger.error('Failed to get CJ products', {
                 error: error.message
             });
-            // Don't return empty array, throw the error so we can debug
             throw error;
         }
     }
