@@ -15,6 +15,16 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// Get distinct categories (must be before /:id)
+router.get('/categories', async (req, res, next) => {
+  try {
+    const categories = await productService.getCategories();
+    res.json({ categories });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get single product by ID
 // Get product by slug (place before ID route to avoid param collisions)
 router.get('/slug/:slug', async (req, res, next) => {

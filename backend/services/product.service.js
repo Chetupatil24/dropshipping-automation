@@ -12,7 +12,7 @@ class ProductService {
       const where = { isActive };
 
       if (category) {
-        where.category = category;
+        where.category = { [Op.iLike]: `%${category}%` };
       }
 
       if (search) {
@@ -25,7 +25,7 @@ class ProductService {
 
       const { count, rows } = await Product.findAndCountAll({
         where,
-        limit,
+        limit: parseInt(limit),
         offset,
         include: [{ model: Supplier, as: 'supplier' }],
         order: [['createdAt', 'DESC']]
@@ -40,6 +40,23 @@ class ProductService {
     } catch (error) {
       logger.error('Error fetching products:', error);
       throw error;
+    }
+  }
+
+  // Get distinct categories
+  async getCategories() {
+    try {
+      const { sequelize } = require('../config/sequelize');
+      const results = await Product.findAll({
+        attributes: [[sequelize.fn('DISTINCT', sequelize.col('category')), 'category']],
+        where: { isActive: true, category: { [Op.ne]: null } },
+        order: [['category', 'ASC']],
+        raw: true
+      });
+      return results.map(r => r.category).filter(Boolean);
+    } catch (error) {
+      logger.error('Error fetching categories:', error);
+      return [];
     }
   }
 

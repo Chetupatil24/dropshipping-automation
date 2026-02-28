@@ -38,14 +38,14 @@ export default function Home() {
   };
 
   const categories = [
-    { name: 'Fashion', icon: '👔', link: '/products?category=fashion', color: 'from-blue-600 to-blue-800' },
-    { name: 'Footwear', icon: '👟', link: '/products?category=footwear', color: 'from-teal-500 to-teal-700' },
-    { name: 'Electronics', icon: '📱', link: '/products?category=electronics', color: 'from-gray-700 to-gray-900' },
-    { name: 'Accessories', icon: '⌚', link: '/products?category=accessories', color: 'from-amber-500 to-amber-700' },
-    { name: 'Home & Kitchen', icon: '🏠', link: '/products?category=home', color: 'from-teal-600 to-emerald-600' },
-    { name: 'Custom Prints', icon: '🎨', link: '/products?category=custom', color: 'from-blue-700 to-indigo-700' },
-    { name: 'Ethnic Wear', icon: '🪷', link: '/products?category=ethnic', color: 'from-amber-600 to-orange-600' },
-    { name: 'Sports', icon: '⚽', link: '/products?category=sports', color: 'from-teal-600 to-cyan-600' },
+    { name: 'Women\'s Fashion', icon: '👗', link: '/products?category=Lady', color: 'from-pink-500 to-rose-600' },
+    { name: 'Footwear', icon: '👟', link: '/products?category=Shoes', color: 'from-teal-500 to-teal-700' },
+    { name: 'Electronics', icon: '📱', link: '/products?category=Electronics', color: 'from-gray-700 to-gray-900' },
+    { name: 'Accessories', icon: '⌚', link: '/products?category=Accessories', color: 'from-amber-500 to-amber-700' },
+    { name: 'Home & Kitchen', icon: '🏠', link: '/products?category=Home', color: 'from-teal-600 to-emerald-600' },
+    { name: 'Jewelry', icon: '💍', link: '/products?category=Jewelry', color: 'from-yellow-500 to-yellow-700' },
+    { name: 'Sports', icon: '⚽', link: '/products?category=Sports', color: 'from-teal-600 to-cyan-600' },
+    { name: 'Baby & Kids', icon: '🍼', link: '/products?category=Baby', color: 'from-sky-500 to-blue-600' },
   ];
 
   return (
@@ -120,13 +120,13 @@ export default function Home() {
         <div className="bg-white border-t border-gray-100">
           <div className="container mx-auto px-4">
             <div className="flex items-center gap-8 py-2 text-sm overflow-x-auto">
-              <Link href="/products?category=fashion" className="hover:text-primary font-semibold whitespace-nowrap">Fashion</Link>
+              <Link href="/products?category=Lady" className="hover:text-primary font-semibold whitespace-nowrap">Women&apos;s</Link>
               <Link href="/products?category=electronics" className="hover:text-primary font-semibold whitespace-nowrap">Electronics</Link>
               <Link href="/products?category=footwear" className="hover:text-primary font-semibold whitespace-nowrap">Footwear</Link>
               <Link href="/products?category=home" className="hover:text-primary font-semibold whitespace-nowrap">Home & Kitchen</Link>
               <Link href="/products?category=accessories" className="hover:text-primary font-semibold whitespace-nowrap">Accessories</Link>
               <Link href="/products?category=custom" className="hover:text-primary font-semibold whitespace-nowrap">Custom Products</Link>
-              <Link href="/products?category=ethnic" className="hover:text-primary font-semibold whitespace-nowrap">Ethnic Wear</Link>
+              <Link href="/products?category=Jewelry" className="hover:text-primary font-semibold whitespace-nowrap">Jewelry</Link>
               <Link href="/products?category=sports" className="hover:text-primary font-semibold whitespace-nowrap">Sports</Link>
             </div>
           </div>
@@ -144,7 +144,7 @@ export default function Home() {
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="inline-block bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-bold mb-4 animate-pulse">🎉 LIMITED TIME OFFER</div>
-          <h1 className="text-5xl md:text-7xl font-black mb-4 drop-shadow-2xl">Big Billion Days Sale!</h1>
+          <h1 className="text-5xl md:text-7xl font-black mb-4 drop-shadow-2xl">Grand Season Sale!</h1>
           <p className="text-2xl md:text-3xl mb-8 font-light">Up to <span className="text-amber-400 font-bold">80% Off</span> + Extra 10% Bank Discount</p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link href="/products" className="bg-secondary hover:bg-secondary-dark text-white font-bold px-10 py-5 rounded-full text-lg shadow-2xl hover:scale-105 transition-transform">
@@ -359,7 +359,7 @@ export default function Home() {
             <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-8 rounded-lg">
               <h3 className="text-3xl font-black mb-2">Fashion Sale</h3>
               <p className="text-lg mb-4">Up to 70% Off</p>
-              <Link href="/products?category=fashion" className="bg-white text-blue-700 font-bold px-6 py-3 rounded-sm inline-block hover:bg-gray-100">
+              <Link href="/products?category=Lady" className="bg-white text-blue-700 font-bold px-6 py-3 rounded-sm inline-block hover:bg-gray-100">
                 Shop Now
               </Link>
             </div>
@@ -420,7 +420,7 @@ export default function Home() {
             <div>
               <h4 className="text-white font-bold mb-4">Shop</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/products?category=fashion" className="hover:text-white">Fashion</Link></li>
+                <li><Link href="/products?category=Lady" className="hover:text-white">Women&apos;s Fashion</Link></li>
                 <li><Link href="/products?category=electronics" className="hover:text-white">Electronics</Link></li>
                 <li><Link href="/products?category=footwear" className="hover:text-white">Footwear</Link></li>
                 <li><Link href="/products?category=accessories" className="hover:text-white">Accessories</Link></li>
