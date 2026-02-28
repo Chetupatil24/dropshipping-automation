@@ -87,7 +87,8 @@ async function syncCJProducts(options = {}) {
                     }
                 }
 
-                // Get product details for more information
+                // Get product details - respect CJ's 1 req/second rate limit
+                await new Promise(resolve => setTimeout(resolve, 1200));
                 const details = await cjDropshippingService.getProductDetail(cjProduct.pid);
 
                 if (!details) {

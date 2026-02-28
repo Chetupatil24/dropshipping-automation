@@ -236,7 +236,7 @@ class CJDropshippingService {
         try {
             const response = await this.makeRequest('/product/query', {
                 pid: productId
-            });
+            }, 'GET');
 
             return response.data;
         } catch (error) {
