@@ -1,5 +1,6 @@
 const axios = require('axios');
 const vendorConfig = require('./vendorConfig');
+const printroveTokenService = require('./printroveTokenService');
 const logger = require('../../utils/logger');
 
 /**
@@ -29,7 +30,7 @@ class PrintroveAdapter {
                 `${this.config.baseUrl}/orders`,
                 printroveOrder,
                 {
-                    headers: vendorConfig.getAuthHeaders(this.vendorId),
+                    headers: await printroveTokenService.getHeaders(),
                     timeout: this.config.timeout
                 }
             );
@@ -105,7 +106,7 @@ class PrintroveAdapter {
             const response = await axios.get(
                 `${this.config.baseUrl}/orders/${vendorOrderId}`,
                 {
-                    headers: vendorConfig.getAuthHeaders(this.vendorId),
+                    headers: await printroveTokenService.getHeaders(),
                     timeout: this.config.timeout
                 }
             );
@@ -143,9 +144,9 @@ class PrintroveAdapter {
     async getProducts(page = 1, limit = 100) {
         try {
             const response = await axios.get(
-                `${this.config.baseUrl}/catalog/products`,
+                `${this.config.baseUrl}/products`,
                 {
-                    headers: vendorConfig.getAuthHeaders(this.vendorId),
+                    headers: await printroveTokenService.getHeaders(),
                     params: { page, per_page: limit },
                     timeout: this.config.timeout
                 }
@@ -200,7 +201,7 @@ class PrintroveAdapter {
                 `${this.config.baseUrl}/orders/${vendorOrderId}/cancel`,
                 { cancellation_reason: reason },
                 {
-                    headers: vendorConfig.getAuthHeaders(this.vendorId),
+                    headers: await printroveTokenService.getHeaders(),
                     timeout: this.config.timeout
                 }
             );
@@ -234,7 +235,7 @@ class PrintroveAdapter {
                     product_id: productId
                 },
                 {
-                    headers: vendorConfig.getAuthHeaders(this.vendorId),
+                    headers: await printroveTokenService.getHeaders(),
                     timeout: 60000 // Longer timeout for uploads
                 }
             );

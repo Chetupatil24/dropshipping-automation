@@ -9,19 +9,21 @@ class VendorConfig {
         this.vendors = {
             qikink: {
                 name: 'Qikink',
-                apiKey: process.env.QIKINK_API_KEY,
-                apiSecret: process.env.QIKINK_API_SECRET,
+                clientId: process.env.QIKINK_API_KEY,       // 826421948352624
+                apiSecret: process.env.QIKINK_API_SECRET,   // b32b8f16...
                 baseUrl: process.env.QIKINK_BASE_URL || 'https://api.qikink.com',
                 enabled: process.env.QIKINK_ENABLED === 'true',
-                authType: 'basic', // Basic Auth
+                authType: 'basic', // Basic Auth: clientId:apiSecret
                 timeout: 30000
             },
             printrove: {
                 name: 'Printrove',
-                apiToken: process.env.PRINTROVE_API_TOKEN,
-                baseUrl: process.env.PRINTROVE_BASE_URL || 'https://api.printrove.com/api/v1',
+                email: process.env.PRINTROVE_EMAIL,
+                password: process.env.PRINTROVE_PASSWORD,
+                tokenUrl: 'https://api.printrove.com/api/external/token',
+                baseUrl: process.env.PRINTROVE_BASE_URL || 'https://api.printrove.com/api/external',
                 enabled: process.env.PRINTROVE_ENABLED === 'true',
-                authType: 'bearer', // Bearer Token
+                authType: 'printrove', // Email/password → Bearer token
                 timeout: 30000
             },
             seasonsway: {
@@ -78,9 +80,9 @@ class VendorConfig {
 
         switch (config.authType) {
             case 'basic':
-                // Qikink: Basic Auth
+                // Qikink: Basic Auth (clientId:apiSecret)
                 const credentials = Buffer.from(
-                    `${config.apiKey}:${config.apiSecret}`
+                    `${config.clientId}:${config.apiSecret}`
                 ).toString('base64');
                 return {
                     'Authorization': `Basic ${credentials}`,
@@ -88,10 +90,18 @@ class VendorConfig {
                 };
 
             case 'bearer':
-                // Printrove: Bearer Token
+                // Generic Bearer Token
                 return {
                     'Authorization': `Bearer ${config.apiToken}`,
                     'Content-Type': 'application/json'
+                };
+
+            case 'printrove':
+                // Printrove uses email/password → token (handled by PrintroveTokenService)
+                // Return placeholder; adapter calls PrintroveTokenService.getHeaders() instead
+                return {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 };
 
             case 'apikey':
