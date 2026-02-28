@@ -45,11 +45,27 @@ async function syncCJProducts(options = {}) {
 
         for (let page = 1; page <= pages; page++) {
             console.log(`  Fetching page ${page}/${pages}...`);
-            const products = await cjDropshippingService.getProducts({
-                page,
-                pageSize: 50,
-                categoryId
-            });
+            // Respect 1 req/second rate limit on list endpoint
+            if (page > 1) await new Promise(resolve => setTimeout(resolve, 1500));
+
+            let products = null;
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    products = await cjDropshippingService.getProducts({
+                        page,
+                        pageSize: 50,
+                        categoryId
+                    });
+                    break;
+                } catch (err) {
+                    if (err.message.includes('Too Many Requests') && attempt < 3) {
+                        console.log(`  ⏳ Rate limited, waiting 5s before retry (attempt ${attempt}/3)...`);
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                    } else {
+                        throw err;
+                    }
+                }
+            }
 
             if (products && products.length > 0) {
                 allProducts = allProducts.concat(products);
