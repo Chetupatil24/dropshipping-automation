@@ -8,22 +8,21 @@ class EnvironmentValidator {
 
     // Validate required environment variables
     validateRequired() {
-        const required = [
-            'DB_HOST',
-            'DB_PORT',
-            'DB_NAME',
-            'DB_USER',
-            'DB_PASSWORD',
-            'JWT_SECRET',
-            'REDIS_HOST',
-            'REDIS_PORT'
-        ];
+        // Database: accept DATABASE_URL (Supabase) OR individual DB_* vars
+        const hasDbUrl = !!process.env.DATABASE_URL;
+        const hasDbParts = process.env.DB_HOST && process.env.DB_NAME &&
+                           process.env.DB_USER && process.env.DB_PASSWORD;
 
-        required.forEach(key => {
-            if (!process.env[key]) {
-                this.errors.push(`Missing required environment variable: ${key}`);
-            }
-        });
+        if (!hasDbUrl && !hasDbParts) {
+            this.errors.push(
+                'Missing database config: set DATABASE_URL (Supabase) OR DB_HOST/DB_NAME/DB_USER/DB_PASSWORD'
+            );
+        }
+
+        // JWT is always required
+        if (!process.env.JWT_SECRET) {
+            this.errors.push('Missing required environment variable: JWT_SECRET');
+        }
 
         // Validate JWT_SECRET strength
         if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
@@ -88,11 +87,15 @@ class EnvironmentValidator {
         }
     }
 
-    // Test Redis connectivity
+    // Test Redis connectivity (optional — background jobs disabled without Redis)
     async validateRedis() {
+        if (!process.env.REDIS_URL && !process.env.REDIS_HOST) {
+            this.warnings.push('Redis not configured (REDIS_URL or REDIS_HOST). Background job queues will be disabled.');
+            return true;
+        }
         try {
             const Redis = require('ioredis');
-            const redis = new Redis({
+            const redis = new Redis(process.env.REDIS_URL || {
                 host: process.env.REDIS_HOST || 'localhost',
                 port: process.env.REDIS_PORT || 6379,
                 maxRetriesPerRequest: 1
@@ -103,8 +106,8 @@ class EnvironmentValidator {
             logger.info('✓ Redis connection successful');
             return true;
         } catch (error) {
-            this.errors.push(`Redis connection failed: ${error.message}`);
-            return false;
+            this.warnings.push(`Redis connection failed: ${error.message} — background jobs will not run`);
+            return true; // Non-fatal
         }
     }
 

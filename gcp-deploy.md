@@ -1,79 +1,151 @@
-# Google Cloud Platform (GCP) Deployment Guide
+# GCP Deployment Guide — Ruthan Dropshipping
 
-You have decided to host on Google Cloud Platform (GCP) for the next 3 months to make everything perfect. This is a great choice as GCP provides enterprise-grade infrastructure.
+## Architecture
 
-We will use **Google Cloud Run** for the backend (it's serverless Docker, meaning it scales to 0 and costs nothing when there's no traffic) and **Firebase Hosting** or **Cloud Storage + Cloud CDN** for the frontend.
+| Service | Platform |
+|---------|----------|
+| Backend API | Google Cloud Run |
+| Customer Frontend | Firebase Hosting (Next.js SSR) |
+| Database | Supabase (already configured) |
+| Image CDN | Cloudinary (already configured) |
 
-## Prerequisites
+---
 
-1.  **Google Cloud Account:** Ensure you have an active GCP account with billing enabled (GCP gives new users $300 in free credits for the first 90 days, which perfectly covers your 3-month timeline!).
-2.  **Google Cloud CLI (`gcloud`):** You need this installed on your computer to deploy automatically. If you don't have it, we need to install it.
+## Step 1 — Install CLIs & Authenticate
 
-## The Architecture
+```bash
+# Google Cloud CLI
+curl https://sdk.cloud.google.com | bash && exec -l $SHELL
 
-*   **Database:** Supabase (Already configured and free)
-*   **Image CDN:** Cloudinary (Already configured and free)
-*   **Backend API:** Google Cloud Run (Using the `Dockerfile` just created)
-*   **Frontend:** Google Firebase Hosting (Extremely fast, built for Next.js)
+# Firebase CLI
+npm install -g firebase-tools
 
-## Phase 1: Deploy Backend to Cloud Run
+# Login
+gcloud auth login
+firebase login
 
-1.  Open your terminal in the `dropshipping-automation` root folder.
-2.  Authenticate with Google Cloud:
-    ```bash
-    gcloud auth login
-    ```
-3.  Set your project ID (replace with your actual GCP project ID):
-    ```bash
-    gcloud config set project [YOUR-PROJECT-ID]
-    ```
-4.  Run the automated deployment command. This builds the Docker container and deploys it to Cloud Run. Make sure to replace the placeholder environment variables with your actual Supabase and Cloudinary keys:
-    ```bash
-    gcloud run deploy ruthan-backend-api \
-      --source . \
-      --region us-central1 \
-      --allow-unauthenticated \
-      --set-env-vars="NODE_ENV=production" \
-      --set-env-vars="PORT=8080" \
-      --set-env-vars="SUPABASE_URL=https://ccwnnradnszbwjfjfpvk.supabase.co" \
-      --set-env-vars="SUPABASE_KEY=REDACTED_SUPABASE_KEY" \
-      --set-env-vars="CLOUDINARY_CLOUD_NAME=dfgn2etwj" \
-      --set-env-vars="CLOUDINARY_API_KEY=763814895541787" \
-      --set-env-vars="CLOUDINARY_API_SECRET=REDACTED_CLOUDINARY_SECRET"
-    ```
-5.  After a few minutes, `gcloud` will output a **Service URL** (e.g., `https://ruthan-backend-api-xyz-uc.a.run.app`). **Save this URL!**
+# Set project
+gcloud config set project ruthan-dropshipping
+```
 
-## Phase 2: Deploy Frontend to Firebase Hosting
+---
 
-Firebase Hosting has native, deep integration with Next.js applications and handles SSR (Server-Side Rendering) or Static Exports perfectly.
+## Step 2 — Deploy Backend to Cloud Run
 
-1.  Install the Firebase CLI:
-    ```bash
-    npm install -g firebase-tools
-    ```
-2.  Log in to Firebase:
-    ```bash
-    firebase login
-    ```
-3.  Initialize the project:
-    ```bash
-    firebase init hosting
-    ```
-    *   Select your GCP Project.
-    *   When asked what directory to use as the public directory, type `frontend/out`
-    *   Configure as a single-page app? **No**
-    *   Set up automatic builds and deploys with GitHub? **Optional (can do later)**
-4.  Update your `frontend/.env.production` file to point to your new Cloud Run API URL:
-    ```
-    NEXT_PUBLIC_API_URL=https://ruthan-backend-api-xyz-uc.a.run.app
-    NEXT_PUBLIC_SUPABASE_URL=https://ccwnnradnszbwjfjfpvk.supabase.co
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=REDACTED_SUPABASE_KEY
-    ```
-5.  Build and Deploy:
-    ```bash
-    cd frontend
-    npm run build
-    firebase deploy --only hosting
-    ```
+Run from the project root (uses the `Dockerfile`):
 
-Your entire stack will now be running on Google Cloud!
+```bash
+gcloud run deploy ruthan-backend-api \
+  --source . \
+  --region asia-south1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --min-instances 0 \
+  --max-instances 10 \
+  --memory 512Mi \
+  --cpu 1 \
+  --set-env-vars "NODE_ENV=production,PORT=8080" \
+  --set-env-vars "SUPABASE_URL=https://ccwnnradnszbwjfjfpvk.supabase.co" \
+  --set-env-vars "SUPABASE_KEY=REDACTED_SUPABASE_KEY" \
+  --set-env-vars "SUPABASE_SERVICE_ROLE=REDACTED_SUPABASE_SERVICE_ROLE" \
+  --set-env-vars "DATABASE_URL=postgresql://postgres:YOURPASSWORD@db.ccwnnradnszbwjfjfpvk.supabase.co:5432/postgres" \
+  --set-env-vars "CLOUDINARY_CLOUD_NAME=dfgn2etwj,CLOUDINARY_API_KEY=763814895541787,CLOUDINARY_API_SECRET=REDACTED_CLOUDINARY_SECRET" \
+  --set-env-vars "JWT_SECRET=REPLACE_WITH_STRONG_SECRET,JWT_EXPIRE=7d" \
+  --set-env-vars "FRONTEND_URL=https://ruthan.com,ADMIN_URL=https://admin.ruthan.com"
+```
+
+After deploy, gcloud prints a Service URL:
+`https://ruthan-backend-api-XXXXXXXX-el.a.run.app`
+
+Verify it works:
+```bash
+curl https://ruthan-backend-api-XXXXXXXX-el.a.run.app/health
+```
+
+---
+
+## Step 3 — Deploy Frontend to Firebase Hosting
+
+1. Update `frontend/.env.production` with your Cloud Run URL:
+```
+NEXT_PUBLIC_API_URL=https://ruthan-backend-api-XXXXXXXX-el.a.run.app
+NEXT_PUBLIC_RAZORPAY_KEY=rzp_live_xxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_SITE_URL=https://ruthan.com
+```
+
+2. Enable Firebase Next.js support:
+```bash
+firebase experiments:enable webframeworks
+```
+
+3. Deploy:
+```bash
+cd frontend && npm install && npm run build && cd ..
+firebase deploy --only hosting
+```
+
+4. Connect domain: Firebase Console → Hosting → Add custom domain → `ruthan.com`
+
+---
+
+## Step 4 — CI/CD with Cloud Build (Auto-deploy on git push)
+
+```bash
+# Create Docker image repository
+gcloud artifacts repositories create ruthan \
+  --repository-format=docker \
+  --location=asia-south1
+
+# Connect GitHub and create build trigger
+gcloud builds triggers create github \
+  --repo-name=YOUR_REPO \
+  --repo-owner=YOUR_GITHUB_USER \
+  --branch-pattern='^main$' \
+  --build-config=cloudbuild.yaml
+```
+
+Now every `git push origin main` builds + deploys automatically.
+
+---
+
+## Environment Variables
+
+| Variable | Value |
+|----------|-------|
+| `NODE_ENV` | `production` |
+| `PORT` | `8080` |
+| `DATABASE_URL` | Supabase connection string |
+| `SUPABASE_URL` | `https://ccwnnradnszbwjfjfpvk.supabase.co` |
+| `SUPABASE_KEY` | Supabase anon/publishable key |
+| `SUPABASE_SERVICE_ROLE` | Supabase service key |
+| `CLOUDINARY_CLOUD_NAME` | `dfgn2etwj` |
+| `CLOUDINARY_API_KEY` | `763814895541787` |
+| `CLOUDINARY_API_SECRET` | `REDACTED_CLOUDINARY_SECRET` |
+| `JWT_SECRET` | Generate: `openssl rand -hex 32` |
+| `RAZORPAY_KEY_ID` | Razorpay live key |
+| `RAZORPAY_KEY_SECRET` | Razorpay live secret |
+| `FRONTEND_URL` | `https://ruthan.com` |
+
+---
+
+## Useful Commands
+
+```bash
+# View Cloud Run logs
+gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=ruthan-backend-api" --limit 50
+
+# Get service URL
+gcloud run services describe ruthan-backend-api --region asia-south1 --format="value(status.url)"
+
+# Update a single env var
+gcloud run services update ruthan-backend-api --region asia-south1 --update-env-vars "KEY=value"
+```
+
+---
+
+## Cost (~$0–5/month)
+
+- Cloud Run: scales to 0, pay only per request
+- Firebase Hosting: free tier covers most traffic
+- Supabase: free tier (500MB DB, 2GB bandwidth)
+- Cloudinary: free tier (25 credits/month)

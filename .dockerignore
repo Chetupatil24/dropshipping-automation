@@ -1,0 +1,50 @@
+# Version control
+.git
+.gitignore
+
+# Local env files (secrets are injected via Cloud Run env vars)
+.env
+.env.local
+.env.*.local
+.env.railway
+.env.example
+
+# Frontend & admin (backend-only Docker image)
+frontend/
+admin-dashboard/
+
+# Root-level node_modules (backend installs its own)
+node_modules/
+package-lock.json
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+.next/
+out/
+
+# Documentation
+*.md
+gcp-deploy.md
+API.md
+README.md
+
+# Dev / CI scripts
+scripts/
+.cloudbuild/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+**/*.test.js
+**/*.spec.js

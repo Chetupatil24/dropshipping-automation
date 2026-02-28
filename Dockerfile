@@ -1,38 +1,41 @@
-# Base image
-FROM node:18-alpine
+# ---- Dependencies stage ----
+FROM node:18-alpine AS deps
 
-# Install Chrome for Puppeteer
-RUN apk add --no-cache \
-      chromium \
-      nss \
-      freetype \
-      harfbuzz \
-      ca-certificates \
-      ttf-freefont \
-      nodejs \
-      yarn
-
-# Tell Puppeteer to skip installing Chrome safely and use the system Chrome
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package.json (has all backend deps)
 COPY package*.json ./
-COPY backend/package*.json ./backend/
 
-# Install dependencies
-RUN cd backend && npm ci --only=production
+# Install production dependencies only
+RUN npm ci --only=production --ignore-scripts
 
-# Copy backend code
+# ---- Final stage ----
+FROM node:18-alpine
+
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /app
+
+# Copy installed node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy backend source code only
 COPY backend ./backend
 
-# Copy standard environment file
-COPY .env ./
+# GCP Cloud Run listens on PORT env var (default 8080)
+ENV NODE_ENV=production
+ENV PORT=8080
 
-# Expose port
+# Run as non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
 EXPOSE 8080
 
-# Start server
+# Health check for Cloud Run readiness probes
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+  CMD wget -qO- http://localhost:8080/health || exit 1
+
 CMD ["node", "backend/server.js"]
