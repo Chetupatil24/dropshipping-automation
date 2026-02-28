@@ -97,38 +97,41 @@ async function syncCJProducts(options = {}) {
                     continue;
                 }
 
+                // Generate URL-friendly slug from product name + pid suffix for uniqueness
+                const productName = cjProduct.productNameEn || cjProduct.productName || 'product';
+                const baseSlug = productName
+                    .toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .substring(0, 60);
+                const slug = `${baseSlug}-${cjProduct.pid.toString().slice(-6)}`;
+
                 // Create product in database
                 const product = await Product.create({
-                    name: cjProduct.productNameEn || cjProduct.productName,
-                    description: details.description || cjProduct.productNameEn || 'No description available',
+                    name: productName,
+                    slug,
+                    description: details.description || productName || 'No description available',
                     price: parseFloat(cjProduct.sellPrice || details.sellPrice || 0),
-                    originalPrice: parseFloat(cjProduct.originalPrice || details.originalPrice || 0),
+                    compareAtPrice: parseFloat(cjProduct.originalPrice || details.originalPrice || 0) || null,
                     costPrice: parseFloat(cjProduct.costPrice || details.costPrice || 0),
-                    currency: 'USD', // CJ prices are in USD
                     stock: details.inventory || 999,
                     images: cjProduct.productImage ? [cjProduct.productImage] : [],
                     category: cjProduct.categoryName || 'General',
                     supplierId: supplier.id,
                     supplierProductId: cjProduct.pid,
-                    supplierVariantId: details.vid || null,
                     isActive: true,
                     sku: `CJ-${cjProduct.pid}`,
-                    weight: details.packWeight || 0,
-                    dimensions: details.packLength && details.packWidth && details.packHeight
-                        ? `${details.packLength}x${details.packWidth}x${details.packHeight}`
+                    weight: details.packWeight ? parseFloat(details.packWeight) : null,
+                    dimensions: (details.packLength && details.packWidth && details.packHeight)
+                        ? { length: details.packLength, width: details.packWidth, height: details.packHeight }
                         : null,
                     tags: [
                         'CJ Dropshipping',
                         cjProduct.categoryName || 'General',
                         'International'
-                    ],
-                    metadata: {
-                        cjProductId: cjProduct.pid,
-                        cjVariantId: details.vid,
-                        cjCategoryId: cjProduct.categoryId,
-                        shippingMethod: 'International',
-                        processingTime: '2-5 days'
-                    }
+                    ]
                 });
 
                 created++;
