@@ -262,12 +262,12 @@ className ="text-teal-600 focus:ring-teal-500"
                 <div key={product.id} className="group card p-0 overflow-hidden hover:shadow-2xl transition-all">
             <Link href={`/products/${product.slug}`}>
                 <div className="aspect-square bg-gray-100 overflow-hidden relative">
-                {product.images?.[0] && (
                     <img
-                        src={product.images[0]}
+                        src={product.images?.[0] || 'https://placehold.co/400x400?text=No+Image'}
                         alt={product.name}
+                        onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                        />
+                    />
                                                     )}
                 {product.discount && (
                     <span className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full font-bold text-sm">
@@ -296,7 +296,7 @@ className ="text-teal-600 focus:ring-teal-500"
             <span> Bangalore Vendor</span>
                                                 </div>
     <div className="flex items-center justify-between">
-        <div className ="price text-xl">₹{product.price}</div>
+        <div className ="price text-xl">₹{(product.price * 83).toFixed(0)}</div>
             <button
 onClick = {() => handleAddToCart(product)}
 className ="bg-teal-600 hover:bg-teal-700 text-white p-3 rounded-full hover:scale-110 transition-all shadow-md"

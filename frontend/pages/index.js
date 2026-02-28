@@ -214,18 +214,12 @@ export default function Home() {
               products.map((product) => (
                 <div key={product.id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                   <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                    {product.image && (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    )}
-                    {!product.image && (
-                      <div className="w-full h-full flex items-center justify-center text-6xl">
-                        📦
-                      </div>
-                    )}
+                    <img
+                      src={product.images?.[0] || 'https://placehold.co/400x400?text=No+Image'}
+                      alt={product.name}
+                      onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                     {/* Quick add & discount badges */}
                     <button
                       className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
@@ -254,8 +248,8 @@ export default function Home() {
                       <span className="text-xs text-gray-500 font-medium">(234)</span>
                     </div>
                     <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-2xl font-black text-gray-900">₹{product.price}</span>
-                      <span className="text-sm text-gray-400 line-through">₹{Math.round(product.price * 1.5)}</span>
+                      <span className="text-2xl font-black text-gray-900">₹{(product.price * 83).toFixed(0)}</span>
+                      <span className="text-sm text-gray-400 line-through">₹{Math.round(product.price * 83 * 1.3)}</span>
                     </div>
                     <button
                       onClick={() => handleAddToCart(product)}

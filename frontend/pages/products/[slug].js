@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -20,7 +20,7 @@ export default function ProductDetail() {
     const [loading, setLoading] = useState(true);
 
     // Fetch product on load
-    useState(() => {
+    useEffect(() => {
         if (slug) {
             fetchProduct();
         }
@@ -29,7 +29,7 @@ export default function ProductDetail() {
     const fetchProduct = async () => {
         try {
             const { data } = await productsAPI.getBySlug(slug);
-            setProduct(data);
+            setProduct(data.product || data);
         } catch (error) {
             toast.error('Product not found');
             router.push('/');
@@ -80,8 +80,9 @@ export default function ProductDetail() {
                             {/* Main Image */}
                             <div className="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 mb-4 overflow-hidden">
                                 <img
-                                    src={product.images?.[selectedImage] || '/placeholder.png'}
+                                    src={product.images?.[selectedImage] || 'https://placehold.co/400x400?text=No+Image'}
                                     alt={product.name}
+                                    onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }}
                                     className="w-full h-auto rounded-2xl hover:scale-105 transition-transform duration-300"
                                 />
                             </div>
@@ -124,11 +125,11 @@ export default function ProductDetail() {
                             <div className="mb-8">
                                 <div className="flex items-baseline gap-4">
                                     <span className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
-                                        ₹{product.price}
+                                        ₹{(product.price * 83).toFixed(0)}
                                     </span>
                                     {product.compareAtPrice && (
                                         <>
-                                            <span className="text-2xl text-gray-500 line-through">₹{product.compareAtPrice}</span>
+                                            <span className="text-2xl text-gray-500 line-through">₹{(product.compareAtPrice * 83).toFixed(0)}</span>
                                             <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-purple-900 px-4 py-1 rounded-full font-bold text-sm">
                                                 SAVE {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}%
                                             </span>
