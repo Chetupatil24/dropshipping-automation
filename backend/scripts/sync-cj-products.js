@@ -26,12 +26,10 @@ async function syncCJProducts(options = {}) {
         if (!supplier) {
             supplier = await Supplier.create({
                 name: 'CJ Dropshipping',
-                apiKey: process.env.CJ_DROPSHIP_API_KEY,
-                country: 'CN',
-                shippingTime: '7-15 days',
+                type: 'cj_dropship',
+                apiKey: process.env.CJ_API_KEY || process.env.CJ_DROPSHIP_API_KEY,
                 isActive: true,
-                config: {
-                    type: 'cj_dropshipping',
+                settings: {
                     baseUrl: 'https://developers.cjdropshipping.com/api2.0/v1'
                 }
             });

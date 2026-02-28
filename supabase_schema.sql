@@ -38,8 +38,8 @@ ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to products" ON products FOR SELECT USING (true);
 
 -- Allow authenticated users to view only their own orders and details
-CREATE POLICY "Users can view own orders" ON orders FOR SELECT USING (auth.uid() = customer_id);
-CREATE POLICY "Users can insert own orders" ON orders FOR INSERT WITH CHECK (auth.uid() = customer_id);
+CREATE POLICY "Users can view own orders" ON orders FOR SELECT USING ((select auth.uid()) = customer_id);
+CREATE POLICY "Users can insert own orders" ON orders FOR INSERT WITH CHECK ((select auth.uid()) = customer_id);
 
-CREATE POLICY "Users can view own customer profile" ON customers FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own customer profile" ON customers FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can view own customer profile" ON customers FOR SELECT USING ((select auth.uid()) = id);
+CREATE POLICY "Users can update own customer profile" ON customers FOR UPDATE USING ((select auth.uid()) = id);
