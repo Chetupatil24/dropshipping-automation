@@ -12,7 +12,7 @@ class CJDropshippingService {
     }
 
     /**
-     * Get access token from CJ API
+     * Get access token from CJ API using email + API key (not password)
      */
     async getAccessToken() {
         // Return cached token if still valid
@@ -20,39 +20,16 @@ class CJDropshippingService {
             return this.accessToken;
         }
 
-        // Try direct API key first (CJ provides API keys that work as access tokens)
-        if (this.apiKey) {
-            try {
-                const response = await axios.get(`${this.baseUrl}/authentication/getAccessToken`, {
-                    headers: { 'CJ-Access-Token': this.apiKey }
-                });
-                if (response.data && response.data.result) {
-                    this.accessToken = this.apiKey;
-                    this.tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1000);
-                    logger.info('CJ Dropshipping: Using API key as access token');
-                    return this.accessToken;
-                }
-            } catch (e) {
-                // fall through to email/password
-            }
-
-            // Use API key directly as token
-            this.accessToken = this.apiKey;
-            this.tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1000);
-            return this.accessToken;
-        }
-
         try {
+            // CJ API v2: authenticate with email + apiKey (not password)
             const response = await axios.post(`${this.baseUrl}/authentication/getAccessToken`, {
                 email: this.email,
-                password: this.password
+                password: this.apiKey  // CJ API key is used as password in v2
             });
 
             if (response.data && response.data.result && response.data.data) {
                 this.accessToken = response.data.data.accessToken;
-                // Token expires in 24 hours, cache for 23 hours to be safe
                 this.tokenExpiry = new Date(Date.now() + 23 * 60 * 60 * 1000);
-
                 logger.info('CJ Dropshipping: Access token obtained successfully');
                 return this.accessToken;
             } else {
