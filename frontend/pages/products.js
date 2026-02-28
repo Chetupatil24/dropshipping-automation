@@ -268,7 +268,6 @@ className ="text-teal-600 focus:ring-teal-500"
                         onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                                                    )}
                 {product.discount && (
                     <span className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full font-bold text-sm">
                 {product.discount}% OFF
