@@ -52,6 +52,35 @@ export const useStore = create(
         return get().cart.reduce((count, item) => count + item.quantity, 0);
       },
       
+      // Wishlist state
+      wishlist: [],
+
+      addToWishlist: (product) => {
+        const wishlist = get().wishlist;
+        if (!wishlist.find(i => i.id === product.id)) {
+          set({ wishlist: [...wishlist, product] });
+        }
+      },
+
+      removeFromWishlist: (productId) => {
+        set({ wishlist: get().wishlist.filter(i => i.id !== productId) });
+      },
+
+      isWishlisted: (productId) => {
+        return get().wishlist.some(i => i.id === productId);
+      },
+
+      toggleWishlist: (product) => {
+        const { wishlist, addToWishlist, removeFromWishlist } = get();
+        if (wishlist.find(i => i.id === product.id)) {
+          removeFromWishlist(product.id);
+          return false;
+        } else {
+          addToWishlist(product);
+          return true;
+        }
+      },
+
       // User state
       user: null,
       token: null,
@@ -73,6 +102,7 @@ export const useStore = create(
       name: 'dropship-store',
       partialize: (state) => ({
         cart: state.cart,
+        wishlist: state.wishlist,
         user: state.user,
         token: state.token,
       }),

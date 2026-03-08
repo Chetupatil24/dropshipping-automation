@@ -1,465 +1,312 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { productsAPI } from '../lib/api';
 import { useStore } from '../lib/store';
 import { toast } from 'react-hot-toast';
-import {
-  FiShoppingCart, FiUser, FiSearch, FiTruck, FiShield,
-  FiRefreshCw, FiStar, FiMenu, FiHeart, FiMapPin, FiSmartphone, FiHome, FiCheckCircle
-} from 'react-icons/fi';
-import { FaWhatsapp } from 'react-icons/fa';
+
+const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
+const toMRP = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
+
+const CATEGORIES = [
+  { name: 'Dresses', icon: 'apparel', link: '/products?category=Lady' },
+  { name: 'Accessories', icon: 'watch', link: '/products?category=Accessories' },
+  { name: 'Footwear', icon: 'ice_skating', link: '/products?category=Shoes' },
+  { name: 'Bags', icon: 'shopping_bag', link: '/products?category=Bag' },
+  { name: 'Beauty', icon: 'styler', link: '/products?category=Beauty' },
+  { name: 'Jewelry', icon: 'diamond', link: '/products?category=Jewelry' },
+  { name: 'Home', icon: 'weekend', link: '/products?category=Home' },
+  { name: 'Sports', icon: 'sports_soccer', link: '/products?category=Sports' },
+];
+
+const TRENDING = [
+  { title: 'Summer Streetscape', desc: 'Discover urban essentials for the warmer months.', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80', link: '/products?category=Lady' },
+  { title: 'Artisan Jewels', desc: 'Hand-crafted pieces for your curated wardrobe.', img: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80', link: '/products?category=Jewelry' },
+  { title: 'The Accessory Edit', desc: 'Redefining style with comfort and elegance.', img: 'https://images.unsplash.com/photo-1523779917675-b6ed3a42a561?w=600&q=80', link: '/products?category=Accessories' },
+];
 
 export default function Home() {
+  const router = useRouter();
+  const { addToCart, getCartCount } = useStore();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { addToCart, getCartCount, user } = useStore();
 
   useEffect(() => {
-    fetchProducts();
+    (async () => {
+      try {
+        const { data } = await productsAPI.getAll({ limit: 12 });
+        setProducts(data.products || []);
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
+    })();
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const { data } = await productsAPI.getAll();
-      setProducts(data.products?.slice(0, 12) || []);
-    } catch (error) {
-      console.error('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) router.push(\`/products?search=\${encodeURIComponent(search)}\`);
   };
 
   const handleAddToCart = (product) => {
     addToCart(product);
-    toast.success(`${product.name} added to cart!`);
+    toast.success(\`\${product.name} added to cart!\`);
   };
 
-  const categories = [
-    { name: 'Women\'s Fashion', icon: '👗', link: '/products?category=Lady', color: 'from-pink-500 to-rose-600' },
-    { name: 'Footwear', icon: '👟', link: '/products?category=Shoes', color: 'from-teal-500 to-teal-700' },
-    { name: 'Electronics', icon: '📱', link: '/products?category=Electronics', color: 'from-gray-700 to-gray-900' },
-    { name: 'Accessories', icon: '⌚', link: '/products?category=Accessories', color: 'from-amber-500 to-amber-700' },
-    { name: 'Home & Kitchen', icon: '🏠', link: '/products?category=Home', color: 'from-teal-600 to-emerald-600' },
-    { name: 'Jewelry', icon: '💍', link: '/products?category=Jewelry', color: 'from-yellow-500 to-yellow-700' },
-    { name: 'Sports', icon: '⚽', link: '/products?category=Sports', color: 'from-teal-600 to-cyan-600' },
-    { name: 'Baby & Kids', icon: '🍼', link: '/products?category=Baby', color: 'from-sky-500 to-blue-600' },
-  ];
+  const cartCount = getCartCount();
 
   return (
     <>
       <Head>
-        <title>Ruthan - Online Shopping India | Fashion, Electronics, Home & More</title>
-        <meta name="description" content="Shop online for clothes, shoes, electronics, accessories, and more. Best deals, COD available, free delivery across India." />
-        <meta name="keywords" content="online shopping india, fashion, electronics, footwear, accessories, home appliances, deals, offers" />
+        <title>RUTHAN | Premium Fashion & Lifestyle</title>
+        <meta name="description" content="Discover curated fashion, jewelry, accessories and more. India's premium online fashion destination." />
       </Head>
 
-      {/* Top Bar */}
-      <div className="bg-primary text-white py-1 text-xs">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex gap-4">
-            <span>🎉 Get Extra 10% Off on Your First Order</span>
-          </div>
-          <div className="flex gap-4">
-            <span>📞 Help: +91 98765 43210</span>
-            <span className="hidden md:inline">📧 ruthanshoppingspot@gmail.com</span>
-          </div>
-        </div>
-      </div>
+      <div className="bg-background-light text-slate-900 antialiased min-h-screen">
 
-      {/* Header */}
-      <header className="bg-white shadow-md sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="text-3xl font-black">
-                <span className="text-primary">RUTHAN</span>
-              </div>
-            </Link>
-
-            {/* Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-              <div className="relative w-full">
-                <input
-                  id="search"
-                  name="search"
-                  type="text"
-                  placeholder="Search for Products, Brands and More"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-sm focus:border-primary focus:outline-none"
-                />
-                <button className="absolute right-0 top-0 h-full px-6 bg-primary text-white">
-                  <FiSearch className="text-xl" />
-                </button>
-              </div>
+        {/* HEADER */}
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-8">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="material-symbols-outlined text-slate-700 md:hidden cursor-pointer select-none">menu</button>
+              <nav className="hidden md:flex gap-6 text-sm font-semibold">
+                <Link href="/products?category=Lady" className="hover:text-primary transition-colors text-slate-700">Women</Link>
+                <Link href="/products?category=Men" className="hover:text-primary transition-colors text-slate-700">Men</Link>
+                <Link href="/products?category=Accessories" className="hover:text-primary transition-colors text-slate-700">Accessories</Link>
+                <Link href="/products" className="hover:text-primary transition-colors text-slate-700">All Products</Link>
+              </nav>
             </div>
-
-            {/* Actions */}
+            <Link href="/" className="text-2xl font-extrabold tracking-tighter text-primary no-underline">RUTHAN</Link>
             <div className="flex items-center gap-4">
-              <Link href={user ? '/account' : '/login'} className="hidden md:flex items-center gap-2 hover:text-primary">
-                <FiUser className="text-2xl" />
-                <span className="font-semibold">{user ? 'Account' : 'Login'}</span>
+              <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-slate-100 rounded-full px-4 py-2 w-52">
+                <span className="material-symbols-outlined text-slate-400 text-[20px] mr-1 select-none">search</span>
+                <input value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent border-none focus:outline-none text-sm w-full placeholder:text-slate-400" placeholder="Search..." />
+              </form>
+              <Link href="/wishlist" className="no-underline hidden sm:block">
+                <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">favorite</span>
               </Link>
-
-              <Link href="/cart" className="relative flex items-center gap-2 hover:text-primary">
-                <FiShoppingCart className="text-2xl" />
-                <span className="font-semibold hidden md:inline">Cart</span>
-                {getCartCount() > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    {getCartCount()}
-                  </span>
+              <Link href="/account" className="no-underline">
+                <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">person</span>
+              </Link>
+              <Link href="/cart" className="relative no-underline">
+                <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">shopping_bag</span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
                 )}
               </Link>
             </div>
           </div>
-        </div>
-
-        {/* Category Navigation */}
-        <div className="bg-white border-t border-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-8 py-2 text-sm overflow-x-auto">
-              <Link href="/products?category=Lady" className="hover:text-primary font-semibold whitespace-nowrap">Women&apos;s</Link>
-              <Link href="/products?category=electronics" className="hover:text-primary font-semibold whitespace-nowrap">Electronics</Link>
-              <Link href="/products?category=footwear" className="hover:text-primary font-semibold whitespace-nowrap">Footwear</Link>
-              <Link href="/products?category=home" className="hover:text-primary font-semibold whitespace-nowrap">Home & Kitchen</Link>
-              <Link href="/products?category=accessories" className="hover:text-primary font-semibold whitespace-nowrap">Accessories</Link>
-              <Link href="/products?category=custom" className="hover:text-primary font-semibold whitespace-nowrap">Custom Products</Link>
-              <Link href="/products?category=Jewelry" className="hover:text-primary font-semibold whitespace-nowrap">Jewelry</Link>
-              <Link href="/products?category=sports" className="hover:text-primary font-semibold whitespace-nowrap">Sports</Link>
+          {mobileMenuOpen && (
+            <div className="md:hidden bg-white border-t border-slate-100 px-6 py-4 space-y-3">
+              <Link href="/products?category=Lady" className="block text-sm font-semibold text-slate-700 hover:text-primary">Women</Link>
+              <Link href="/products?category=Men" className="block text-sm font-semibold text-slate-700 hover:text-primary">Men</Link>
+              <Link href="/products?category=Accessories" className="block text-sm font-semibold text-slate-700 hover:text-primary">Accessories</Link>
+              <Link href="/products" className="block text-sm font-semibold text-slate-700 hover:text-primary">All Products</Link>
+              <form onSubmit={handleSearch} className="flex items-center bg-slate-100 rounded-full px-4 py-2">
+                <span className="material-symbols-outlined text-slate-400 text-[20px] mr-1 select-none">search</span>
+                <input value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent border-none focus:outline-none text-sm w-full placeholder:text-slate-400" placeholder="Search..." />
+              </form>
             </div>
-          </div>
-        </div>
-      </header>
+          )}
+        </header>
 
-      {/* Hero Banner - Modern Gradient */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 text-white py-20 overflow-hidden">
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 -left-4 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-          <div className="absolute top-0 -right-4 w-72 h-72 bg-teal-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
-        </div>
-
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="inline-block bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-bold mb-4 animate-pulse">🎉 LIMITED TIME OFFER</div>
-          <h1 className="text-5xl md:text-7xl font-black mb-4 drop-shadow-2xl">Grand Season Sale!</h1>
-          <p className="text-2xl md:text-3xl mb-8 font-light">Up to <span className="text-amber-400 font-bold">80% Off</span> + Extra 10% Bank Discount</p>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link href="/products" className="bg-secondary hover:bg-secondary-dark text-white font-bold px-10 py-5 rounded-full text-lg shadow-2xl hover:scale-105 transition-transform">
-              🛍️ Shop Now
-            </Link>
-            <Link href="/products?deals=true" className="bg-white/20 backdrop-blur-lg border-2 border-white/50 hover:bg-white/30 text-white font-bold px-10 py-5 rounded-full text-lg shadow-2xl hover:scale-105 transition-transform">
-              ⚡ View All Deals
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section - Trendy Cards */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-black mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Shop by Category</h2>
-            <p className="text-gray-600 text-lg">Find exactly what you're looking for</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
-            {categories.map((category) => (
-              <Link
-                key={category.name}
-                href={category.link}
-                className="group"
-              >
-                <div className={`relative bg-gradient-to-br ${category.color} p-6 rounded-2xl text-center hover:scale-110 transition-all duration-300 shadow-xl hover:shadow-2xl overflow-hidden`}>
-                  {/* Glass effect overlay */}
-                  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
-                  <div className="relative z-10">
-                    <div className="text-6xl mb-3 group-hover:scale-125 transition-transform duration-300">{category.icon}</div>
-                    <div className="text-white font-bold text-sm drop-shadow-lg">{category.name}</div>
-                  </div>
-                  {/* Shine effect on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                </div>
+        <main className="max-w-7xl mx-auto pb-24">
+          {/* HERO */}
+          <section className="relative h-[70vh] min-h-[500px] overflow-hidden bg-slate-900">
+            <div className="absolute inset-0 bg-cover bg-center opacity-75" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=85')" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
+            <div className="relative h-full flex flex-col items-center justify-center text-center px-6">
+              <span className="text-white/80 uppercase tracking-[0.3em] text-sm mb-4 font-light">New Collection 2025</span>
+              <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-8 max-w-2xl leading-tight">The Art of Modern Elegance</h2>
+              <Link href="/products" className="bg-primary hover:bg-blue-700 text-white px-10 py-4 rounded-full font-bold transition-all transform hover:scale-105 shadow-xl no-underline">
+                Shop New Arrivals
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trending Products - Modern Grid */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
-        {/* Decorative circles */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-200 rounded-full filter blur-3xl opacity-20 -z-10"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-200 rounded-full filter blur-3xl opacity-20 -z-10"></div>
-
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">🔥 Trending Products</h2>
-              <p className="text-gray-600 text-lg">Hot picks that everyone's buying</p>
             </div>
-            <Link href="/products" className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition-transform">
-              View All →
-            </Link>
+          </section>
+
+          {/* TRUST BADGES */}
+          <div className="bg-white py-6 border-b border-slate-100">
+            <div className="flex flex-wrap justify-around items-center gap-6 px-6 text-slate-500 text-xs font-semibold tracking-widest uppercase">
+              <div className="flex items-center gap-2"><span className="material-symbols-outlined text-primary text-xl select-none">verified</span> Trusted Sellers</div>
+              <div className="flex items-center gap-2"><span className="material-symbols-outlined text-primary text-xl select-none">local_shipping</span> Express Delivery</div>
+              <div className="flex items-center gap-2"><span className="material-symbols-outlined text-primary text-xl select-none">workspace_premium</span> Premium Quality</div>
+              <div className="flex items-center gap-2"><span className="material-symbols-outlined text-primary text-xl select-none">lock</span> Secure Payments</div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {loading ? (
-              // Skeletons
-              Array(12).fill(0).map((_, i) => (
-                <div key={i} className="card h-80 skeleton"></div>
-              ))
-            ) : (
-              products.map((product) => (
-                <div key={product.id} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                  <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-                    <img
-                      src={product.images?.[0] || 'https://placehold.co/400x400?text=No+Image'}
-                      alt={product.name}
-                      onError={(e) => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {/* Quick add & discount badges */}
-                    <button
-                      className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddToCart(product);
-                      }}
-                    >
-                      <FiHeart className="text-red-500 text-lg" />
-                    </button>
-                    <div className="absolute top-3 left-3 bg-amber-500 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg">
-                      33% OFF
-                    </div>
+          {/* CATEGORIES */}
+          <section className="py-16 px-6">
+            <div className="flex justify-between items-end mb-10">
+              <div>
+                <h3 className="text-2xl font-bold mb-2">Shop by Category</h3>
+                <div className="h-1 w-12 rounded-full" style={{ backgroundColor: '#4169e1' }} />
+              </div>
+              <Link href="/products" className="text-primary text-sm font-semibold hover:underline">View All</Link>
+            </div>
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+              {CATEGORIES.map((cat) => (
+                <Link href={cat.link} key={cat.name} className="group cursor-pointer no-underline">
+                  <div className="aspect-square rounded-2xl flex flex-col items-center justify-center transition-all group-hover:-translate-y-1" style={{ backgroundColor: 'rgba(65,105,225,0.06)' }}>
+                    <span className="material-symbols-outlined text-3xl text-primary mb-1.5 select-none">{cat.icon}</span>
+                    <p className="font-semibold text-[11px] text-slate-700 text-center leading-tight px-1">{cat.name}</p>
                   </div>
-                  <div className="p-4">
-                    <Link href={`/products/${product.slug || product.id}`}>
-                      <h3 className="font-bold text-base text-gray-900 mb-2 line-clamp-2 hover:text-primary transition-colors">
-                        {product.name}
-                      </h3>
-                    </Link>
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <div className="flex items-center gap-1 bg-green-600 text-white text-xs px-2.5 py-1 rounded-md font-bold">
-                        <span>4.3</span>
-                        <FiStar className="text-xs fill-current" />
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* RECOMMENDED */}
+          <section className="py-12 bg-white/60">
+            <div className="px-6 mb-8">
+              <h3 className="text-2xl font-bold">Recommended for You</h3>
+              <p className="text-slate-500 text-sm">Curated from our latest collection</p>
+            </div>
+            <div className="flex overflow-x-auto gap-5 px-6 no-scrollbar pb-6">
+              {loading ? Array(5).fill(0).map((_, i) => (
+                <div key={i} className="min-w-[240px] bg-white rounded-xl border border-slate-100 overflow-hidden">
+                  <div className="h-64 bg-slate-100 animate-pulse" />
+                  <div className="p-4 space-y-2"><div className="h-3 bg-slate-100 rounded animate-pulse w-1/2" /><div className="h-4 bg-slate-100 rounded animate-pulse" /></div>
+                </div>
+              )) : products.map((p) => {
+                const price = toINR(p.price);
+                const mrp = toMRP(p.price);
+                const disc = Math.round((1 - price / mrp) * 100);
+                const img = Array.isArray(p.images) ? p.images[0] : (p.imageUrl || p.image || '');
+                return (
+                  <div key={p.id} className="min-w-[240px] bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group border border-slate-100 cursor-pointer">
+                    <div className="relative h-64">
+                      <img src={img || 'https://placehold.co/400x400?text=No+Image'} alt={p.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={e => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }} />
+                      {disc > 5 && <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">-{disc}%</span>}
+                      <button onClick={() => handleAddToCart(p)} className="absolute bottom-2 left-2 right-2 bg-primary text-white text-xs font-bold py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all">Add to Cart</button>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">{p.category || 'Fashion'}</p>
+                      <Link href={\`/products/\${p.slug || p.id}\`} className="no-underline">
+                        <h4 className="font-bold text-slate-800 mb-1 truncate text-sm hover:text-primary">{p.name}</h4>
+                      </Link>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-primary font-bold text-sm">&#8377;{price.toLocaleString('en-IN')}</span>
+                          <span className="text-slate-400 line-through text-xs ml-1">&#8377;{mrp.toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="flex items-center text-yellow-500">
+                          <span className="material-symbols-outlined text-[12px] fill-1 select-none">star</span>
+                          <span className="text-xs text-slate-400 ml-0.5">4.5</span>
+                        </div>
                       </div>
-                      <span className="text-xs text-gray-500 font-medium">(234)</span>
                     </div>
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-2xl font-black text-gray-900">₹{(product.price * 83).toFixed(0)}</span>
-                      <span className="text-sm text-gray-400 line-through">₹{Math.round(product.price * 83 * 1.3)}</span>
-                    </div>
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="w-full bg-gradient-to-r from-secondary to-teal-600 hover:from-teal-600 hover:to-secondary text-white font-bold py-3 rounded-xl transition-all hover:scale-105 shadow-md hover:shadow-xl"
-                    >
-                      🛒 Add to Cart
-                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* TRENDING */}
+          <section className="py-20 px-6">
+            <h3 className="text-3xl font-bold mb-12 text-center">Trending Now</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {TRENDING.map((item) => (
+                <div key={item.title} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all">
+                  <div className="h-72 overflow-hidden">
+                    <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  </div>
+                  <div className="p-6">
+                    <h4 className="text-lg font-bold mb-2">{item.title}</h4>
+                    <p className="text-slate-500 text-sm mb-4">{item.desc}</p>
+                    <Link href={item.link} className="text-primary font-bold flex items-center gap-2 no-underline">
+                      Explore <span className="material-symbols-outlined select-none">arrow_right_alt</span>
+                    </Link>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Customer & Dealer Benefits Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
-
-            {/* Customer Benefits */}
-            <div className="bg-gradient-to-br from-blue-50 to-white p-10 rounded-3xl border border-blue-100 shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
-              <h2 className="text-3xl font-extrabold mb-6 text-gray-900 relative z-10 flex items-center gap-3">
-                <span className="text-4xl">🛍️</span> For Our Customers
-              </h2>
-              <ul className="space-y-6 relative z-10">
-                <li className="flex items-start gap-4">
-                  <div className="bg-blue-600 text-white p-2 rounded-full mt-1">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900">Live Order Tracking via WhatsApp</h4>
-                    <p className="text-gray-600 mt-1">Get instant updates on your phone exactly when your item ships.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <div className="bg-blue-600 text-white p-2 rounded-full mt-1">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900">Curated Product Bundles</h4>
-                    <p className="text-gray-600 mt-1">Save up to 15% when you buy our smart "Frequently Bought Together" recommendations.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <div className="bg-blue-600 text-white p-2 rounded-full mt-1">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900">Ultra-Secure Payments</h4>
-                    <p className="text-gray-600 mt-1">100% secure Razorpay checkout, with Cash on Delivery options available.</p>
-                  </div>
-                </li>
-              </ul>
+              ))}
             </div>
+          </section>
 
-            {/* Dealer Benefits */}
-            <div className="bg-gradient-to-br from-teal-50 to-white p-10 rounded-3xl border border-teal-100 shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-100 rounded-full blur-3xl -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
-              <h2 className="text-3xl font-extrabold mb-6 text-gray-900 relative z-10 flex items-center gap-3">
-                <span className="text-4xl">🤝</span> Become a Dealer
-              </h2>
-              <p className="text-gray-700 mb-8 text-lg relative z-10">
-                Join Ruthan's automated ecosystem and scale your manufacturing or dropshipping business effortlessly.
-              </p>
-              <ul className="space-y-6 relative z-10">
-                <li className="flex items-start gap-4">
-                  <div className="bg-teal-600 text-white p-2 rounded-full mt-1">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900">Smart Auto-Routing</h4>
-                    <p className="text-gray-600 mt-1">Orders are automatically sent to your dashboard. No manual emails needed.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <div className="bg-teal-600 text-white p-2 rounded-full mt-1">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900">High Volume Sales</h4>
-                    <p className="text-gray-600 mt-1">Tap into our massive customer base driven by live sales triggers and AI urgency.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-4">
-                  <div className="bg-teal-600 text-white p-2 rounded-full mt-1">
-                    <FiCheckCircle className="text-xl" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-xl text-gray-900">Next-Day Payouts</h4>
-                    <p className="text-gray-600 mt-1">Get paid instantly upon order fulfillment via our automated wallet system.</p>
-                  </div>
-                </li>
-              </ul>
+          {/* CTA BANNER */}
+          <section className="mx-6 py-12 px-8 rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-8" style={{ backgroundColor: '#4169e1' }}>
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold mb-3">Shop With Confidence</h3>
+              <p className="text-white/80 max-w-lg">Every transaction is encrypted and protected. COD available across India.</p>
             </div>
+            <div className="flex gap-6 items-center shrink-0">
+              <span className="material-symbols-outlined text-5xl select-none">verified_user</span>
+              <span className="material-symbols-outlined text-5xl select-none">credit_card</span>
+              <span className="material-symbols-outlined text-5xl select-none">workspace_premium</span>
+            </div>
+          </section>
+        </main>
 
-          </div>
-        </div>
-      </section>
-
-      {/* Deals Section */}
-      <section className="py-12 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">Today's Best Deals</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-8 rounded-lg">
-              <h3 className="text-3xl font-black mb-2">Fashion Sale</h3>
-              <p className="text-lg mb-4">Up to 70% Off</p>
-              <Link href="/products?category=Lady" className="bg-white text-blue-700 font-bold px-6 py-3 rounded-sm inline-block hover:bg-gray-100">
-                Shop Now
-              </Link>
-            </div>
-            <div className="bg-gradient-to-br from-teal-500 to-teal-700 text-white p-8 rounded-lg">
-              <h3 className="text-3xl font-black mb-2">Electronics</h3>
-              <p className="text-lg mb-4">Min 40% Off</p>
-              <Link href="/products?category=electronics" className="bg-white text-teal-700 font-bold px-6 py-3 rounded-sm inline-block hover:bg-gray-100">
-                Explore
-              </Link>
-            </div>
-            <div className="bg-gradient-to-br from-amber-500 to-amber-700 text-white p-8 rounded-lg">
-              <h3 className="text-3xl font-black mb-2">Custom Gifts</h3>
-              <p className="text-lg mb-4">Starting ₹99</p>
-              <Link href="/products?category=custom" className="bg-white text-amber-700 font-bold px-6 py-3 rounded-sm inline-block hover:bg-gray-100">
-                Create Now
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Badges */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
+        {/* FOOTER */}
+        <footer className="bg-white border-t pt-16 pb-20 md:pb-12 px-6" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             <div>
-              <FiTruck className="text-5xl text-primary mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">Free Delivery</h3>
-              <p className="text-gray-600 text-sm">On orders above ₹499</p>
+              <h2 className="text-2xl font-extrabold text-primary mb-4">RUTHAN</h2>
+              <p className="text-slate-500 mb-5 leading-relaxed text-sm">India's premium fashion destination. Quality, trusted sellers, fast delivery.</p>
+              <div className="flex gap-3">
+                {['public', 'share', 'mail'].map(icon => (
+                  <a key={icon} className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all text-slate-600 no-underline" style={{ borderColor: 'rgba(65,105,225,0.2)' }} href="#">
+                    <span className="material-symbols-outlined text-sm select-none">{icon}</span>
+                  </a>
+                ))}
+              </div>
             </div>
             <div>
-              <FiShield className="text-5xl text-primary mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">Secure Payments</h3>
-              <p className="text-gray-600 text-sm">100% Protected</p>
-            </div>
-            <div>
-              <FiRefreshCw className="text-5xl text-primary mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">Easy Returns</h3>
-              <p className="text-gray-600 text-sm">7 Days Return Policy</p>
-            </div>
-            <div>
-              <FiStar className="text-5xl text-primary mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">Best Quality</h3>
-              <p className="text-gray-600 text-sm">Authentic Products</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="text-white font-bold text-xl mb-4">RUTHAN</h3>
-              <p className="text-sm mb-4">India's most trusted online shopping destination. Shop for electronics, fashion, home & more.</p>
-            </div>
-            <div>
-              <h4 className="text-white font-bold mb-4">Shop</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/products?category=Lady" className="hover:text-white">Women&apos;s Fashion</Link></li>
-                <li><Link href="/products?category=electronics" className="hover:text-white">Electronics</Link></li>
-                <li><Link href="/products?category=footwear" className="hover:text-white">Footwear</Link></li>
-                <li><Link href="/products?category=accessories" className="hover:text-white">Accessories</Link></li>
+              <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Collections</h4>
+              <ul className="space-y-3 text-slate-500 text-sm">
+                <li><Link href="/products?category=Lady" className="hover:text-primary transition-colors">Women's Fashion</Link></li>
+                <li><Link href="/products?category=Jewelry" className="hover:text-primary transition-colors">Fine Jewelry</Link></li>
+                <li><Link href="/products?category=Shoes" className="hover:text-primary transition-colors">Footwear</Link></li>
+                <li><Link href="/products?category=Accessories" className="hover:text-primary transition-colors">Accessories</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/track" className="hover:text-white">Track Order</Link></li>
-                <li><Link href="/returns" className="hover:text-white">Returns</Link></li>
-                <li><Link href="/shipping" className="hover:text-white">Shipping</Link></li>
-                <li><Link href="/faq" className="hover:text-white">FAQs</Link></li>
+              <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Client Services</h4>
+              <ul className="space-y-3 text-slate-500 text-sm">
+                <li><Link href="/track" className="hover:text-primary transition-colors">Track Your Order</Link></li>
+                <li><Link href="/orders" className="hover:text-primary transition-colors">My Orders</Link></li>
+                <li><Link href="/account" className="hover:text-primary transition-colors">My Account</Link></li>
+                <li><Link href="/login" className="hover:text-primary transition-colors">Login / Register</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Contact</h4>
-              <ul className="space-y-2 text-sm">
-                <li>📞 +91 98765 43210</li>
-                <li>📧 ruthanshoppingspot@gmail.com</li>
-                <li>📍 Bangalore, India</li>
-                <li>🕒 24/7 Support</li>
-              </ul>
+              <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Newsletter</h4>
+              <p className="text-slate-500 text-sm mb-4">Subscribe for first access to new arrivals and exclusive deals.</p>
+              <form className="space-y-3" onSubmit={e => e.preventDefault()}>
+                <input className="w-full bg-slate-100 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:outline-none" style={{ outlineColor: '#4169e1' }} placeholder="Email Address" type="email" />
+                <button className="w-full bg-slate-900 text-white font-bold py-3 rounded-lg text-sm hover:bg-black transition-all">Join RUTHAN Insider</button>
+              </form>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-sm text-center">
-            <p>© 2026 Ruthan. All rights reserved. | COD Available | 100% Authentic Products</p>
+          <div className="max-w-7xl mx-auto mt-12 pt-6 border-t text-center text-slate-400 text-xs" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
+            © 2025 RUTHAN. All rights reserved.
           </div>
-        </div>
-      </footer>
+        </footer>
 
-      {/* WhatsApp Float */}
-      <a
-        href="https://wa.me/919876543210?text=Hi Ruthan! I need help"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-2xl hover:bg-green-600 hover:scale-110 transition-all animate-pulse"
-      >
-        <FaWhatsapp className="text-3xl" />
-      </a>
+        {/* BOTTOM MOBILE NAV */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t flex items-center justify-around px-4 py-3 z-50" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
+          <Link href="/" className="flex flex-col items-center gap-0.5 text-primary no-underline">
+            <span className="material-symbols-outlined fill-1 select-none">home</span>
+            <span className="text-[10px] font-bold">Home</span>
+          </Link>
+          <Link href="/products" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
+            <span className="material-symbols-outlined select-none">search</span>
+            <span className="text-[10px] font-bold">Shop</span>
+          </Link>
+          <Link href="/wishlist" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
+            <span className="material-symbols-outlined select-none">favorite</span>
+            <span className="text-[10px] font-bold">Wishlist</span>
+          </Link>
+          <Link href="/orders" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
+            <span className="material-symbols-outlined select-none">package</span>
+            <span className="text-[10px] font-bold">Orders</span>
+          </Link>
+          <Link href="/account" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
+            <span className="material-symbols-outlined select-none">person</span>
+            <span className="text-[10px] font-bold">Profile</span>
+          </Link>
+        </nav>
+      </div>
     </>
   );
 }

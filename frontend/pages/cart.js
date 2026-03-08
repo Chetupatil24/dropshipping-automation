@@ -1,187 +1,133 @@
-import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useStore } from '../lib/store';
-import { paymentsAPI } from '../lib/api';
 import { toast } from 'react-hot-toast';
-import { FiTrash2, FiShoppingBag, FiArrowRight } from 'react-icons/fi';
+import { useState } from 'react';
 
-export default function Cart() {
-  const router = useRouter();
-  const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart, user } = useStore();
-  const [processing, setProcessing] = useState(false);
+const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
 
-  const handleCheckout = async () => {
-    if (!user) {
-      toast.error('Please login to checkout');
-      router.push('/login');
-      return;
-    }
+export default function CartPage() {
+  const { cart, removeFromCart, updateQuantity, getCartTotal, getCartCount, clearCart } = useStore();
+  const [promo, setPromo] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const cartCount = getCartCount();
+  const subtotalUSD = getCartTotal();
+  const subtotalINR = toINR(subtotalUSD);
+  const shippingINR = subtotalINR >= 999 ? 0 : 79;
+  const discount = promoApplied ? Math.round(subtotalINR * 0.1) : 0;
+  const totalINR = subtotalINR + shippingINR - discount;
 
-    if (cart.length === 0) {
-      toast.error('Cart is empty');
-      return;
-    }
-
-    router.push('/checkout');
+  const applyPromo = () => {
+    if (promo.toUpperCase() === 'RUTHAN10') { setPromoApplied(true); toast.success('10% discount applied!'); }
+    else toast.error('Invalid promo code');
   };
-
-  if (cart.length === 0) {
-    return (
-      <>
-        <Head>
-          <title>Shopping Cart - Ruthan</title>
-        </Head>
-
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-teal-50 to-white">
-          <div className="container mx-auto px-4 py-20">
-            <div className="text-center max-w-xl mx-auto">
-              <div className="mb-8">
-                <FiShoppingBag className="text-8xl text-gray-300 mx-auto mb-6" />
-              </div>
-              <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
-                Your Cart is Empty
-              </h1>
-              <p className="text-gray-600 text-lg mb-8">
-                Looks like you haven't added anything to your cart yet. Start shopping now!
-              </p>
-              <Link href="/" className="inline-block bg-gradient-to-r from-secondary to-teal-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:from-teal-600 hover:to-secondary transition-all hover:scale-105 shadow-2xl">
-                Start Shopping 🛍️
-              </Link>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  const subtotal = getCartTotal();
-  const shipping = subtotal >= 1000 ? 0 : 50;
-  const tax = subtotal * 0.18;
-  const total = subtotal + shipping + tax;
 
   return (
     <>
-      <Head>
-        <title>Shopping Cart - Ruthan | The Shopping Spot</title>
-      </Head>
+      <Head><title>Cart | RUTHAN</title></Head>
+      <div className="min-h-screen bg-background-light" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <Link href="/products" className="flex items-center gap-2 text-slate-600 hover:text-primary transition-colors no-underline font-semibold text-sm">
+              <span className="material-symbols-outlined text-sm select-none">arrow_back</span> Continue Shopping
+            </Link>
+            <Link href="/" className="text-2xl font-extrabold tracking-tighter text-primary no-underline">RUTHAN</Link>
+            <div className="w-32" />
+          </div>
+        </header>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-teal-50 to-white">
-        <div className="container mx-auto px-4 py-12">
-          <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
-            Shopping Cart
-          </h1>
-          <p className="text-gray-600 mb-8">{cart.length} item{cart.length !== 1 ? 's' : ''} in your cart</p>
+        <main className="max-w-7xl mx-auto px-6 py-10">
+          <h1 className="text-3xl font-extrabold mb-8">Your Cart <span className="text-slate-400 font-medium text-xl">({cartCount} items)</span></h1>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              {cart.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all border-2 border-transparent hover:border-purple-200">
-                  <div className="flex items-center gap-6">
-                    <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl flex-shrink-0 overflow-hidden">
-                      {item.images && item.images[0] && (
-                        <img
-                          src={item.images[0]}
-                          alt={item.name}
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                        />
-                      )}
-                    </div>
-
-                    <div className="flex-1">
-                      <Link
-                        href={`/products/${item.slug}`}
-                        className="font-bold text-xl hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-blue-600 hover:to-teal-600 transition-all"
-                      >
-                        {item.name}
-                      </Link>
-                      <p className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mt-2">
-                        ₹{item.price}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center space-x-6">
-                      <div className="flex items-center bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-purple-200 rounded-full overflow-hidden">
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="px-4 py-2 hover:bg-purple-100 transition-colors font-bold text-purple-600"
-                        >
-                          -
-                        </button>
-                        <span className="px-6 py-2 font-bold text-purple-900">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="px-4 py-2 hover:bg-purple-100 transition-colors font-bold text-purple-600"
-                        >
-                          +
-                        </button>
-                      </div>
-
-                      <div className="font-extrabold text-2xl w-28 text-right bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
-                        ₹{(parseFloat(item.price) * item.quantity).toFixed(2)}
-                      </div>
-
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 hover:scale-125 transition-transform p-2"
-                      >
-                        <FiTrash2 size={24} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {cart.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-32 text-center">
+              <span className="material-symbols-outlined text-7xl text-slate-300 mb-6 select-none">shopping_bag</span>
+              <h2 className="text-2xl font-bold text-slate-700 mb-3">Your cart is empty</h2>
+              <p className="text-slate-500 mb-8">Looks like you haven't added anything yet.</p>
+              <Link href="/products" className="px-8 py-3 bg-primary text-white rounded-xl font-bold hover:opacity-90 transition no-underline">Start Shopping</Link>
             </div>
-
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 rounded-2xl p-8 shadow-2xl sticky top-4 text-white">
-                <h2 className="text-3xl font-extrabold mb-6">Order Summary</h2>
-
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-lg">
-                    <span>Subtotal:</span>
-                    <span className="font-bold">₹{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-lg">
-                    <span>Shipping:</span>
-                    <span className="font-bold">{shipping === 0 ? '🎉 FREE' : `₹${shipping.toFixed(2)}`}</span>
-                  </div>
-                  <div className="flex justify-between text-lg">
-                    <span>Tax (18% GST):</span>
-                    <span className="font-bold">₹{tax.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t-2 border-white/30 pt-4 flex justify-between font-extrabold text-2xl">
-                    <span>Total:</span>
-                    <span>₹{total.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {subtotal < 1000 && (
-                  <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-6 text-sm">
-                    <p className="font-medium">
-                      💡 Add <span className="font-extrabold">₹{(1000 - subtotal).toFixed(2)}</span> more for FREE shipping!
-                    </p>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleCheckout}
-                  disabled={processing}
-                  className="w-full bg-gradient-to-r from-secondary to-teal-600 text-white px-8 py-4 rounded-full font-extrabold text-lg hover:from-teal-600 hover:to-secondary transition-all hover:scale-105 shadow-lg mb-4 flex items-center justify-center gap-2"
-                >
-                  Proceed to Checkout <FiArrowRight />
+          ) : (
+            <div className="flex flex-col lg:flex-row gap-10">
+              {/* Cart Items */}
+              <div className="flex-1 space-y-4">
+                {cart.map((item) => {
+                  const img = Array.isArray(item.images) ? item.images[0] : (item.imageUrl || item.image || '');
+                  const price = toINR(item.price);
+                  return (
+                    <div key={item.cartItemId || item.id} className="bg-white rounded-2xl p-5 flex gap-5 shadow-sm border border-slate-100">
+                      <div className="w-24 h-28 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
+                        <img src={img || 'https://placehold.co/100x120?text=+'}  alt={item.name} className="w-full h-full object-cover" onError={e => { e.target.src='https://placehold.co/100x120?text=+'; }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start gap-2">
+                          <h3 className="font-bold text-slate-900 text-sm leading-tight line-clamp-2">{item.name}</h3>
+                          <button onClick={() => { removeFromCart(item.cartItemId || item.id); toast.success('Removed'); }} className="flex-shrink-0 text-slate-400 hover:text-red-500 transition-colors ml-2">
+                            <span className="material-symbols-outlined text-lg select-none">delete</span>
+                          </button>
+                        </div>
+                        {item.category && <p className="text-xs text-slate-400 mt-1 mb-3">{item.category}</p>}
+                        <div className="flex items-center justify-between mt-auto">
+                          <div className="flex items-center gap-2 border border-slate-200 rounded-lg overflow-hidden">
+                            <button onClick={() => updateQuantity ? updateQuantity(item.cartItemId || item.id, Math.max(1, item.quantity - 1)) : null} className="px-3 py-1 text-lg font-bold hover:bg-slate-100 transition-colors">-</button>
+                            <span className="px-3 font-bold text-sm">{item.quantity || 1}</span>
+                            <button onClick={() => updateQuantity ? updateQuantity(item.cartItemId || item.id, (item.quantity || 1) + 1) : null} className="px-3 py-1 text-lg font-bold hover:bg-slate-100 transition-colors">+</button>
+                          </div>
+                          <p className="font-extrabold text-slate-900">₹{(price * (item.quantity || 1)).toLocaleString('en-IN')}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <button onClick={() => { clearCart(); toast.success('Cart cleared'); }} className="text-sm text-slate-400 hover:text-red-500 transition-colors font-medium flex items-center gap-1 mt-2">
+                  <span className="material-symbols-outlined text-sm select-none">delete_sweep</span> Clear Cart
                 </button>
+              </div>
 
-                <Link href="/" className="block w-full bg-white/20 backdrop-blur-sm text-white text-center px-8 py-3 rounded-full font-bold hover:bg-white/30 transition-all">
-                  Continue Shopping
-                </Link>
+              {/* Order Summary */}
+              <div className="w-full lg:w-96 shrink-0">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sticky top-28">
+                  <h2 className="text-xl font-extrabold mb-6">Order Summary</h2>
+                  <div className="space-y-3 text-sm mb-5">
+                    <div className="flex justify-between"><span className="text-slate-600">Subtotal ({cartCount} items)</span><span className="font-bold">₹{subtotalINR.toLocaleString('en-IN')}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-600">Shipping</span><span className={`font-bold ${shippingINR === 0 ? 'text-green-600' : ''}`}>{shippingINR === 0 ? 'FREE' : `₹${shippingINR}`}</span></div>
+                    {promoApplied && <div className="flex justify-between text-green-600"><span>Promo (RUTHAN10)</span><span className="font-bold">-₹{discount.toLocaleString('en-IN')}</span></div>}
+                    <div className="border-t border-slate-200 pt-3 flex justify-between text-base"><span className="font-bold">Total</span><span className="font-extrabold text-xl text-primary">₹{totalINR.toLocaleString('en-IN')}</span></div>
+                  </div>
+
+                  {/* Promo */}
+                  {!promoApplied && (
+                    <div className="flex gap-2 mb-5">
+                      <input value={promo} onChange={e => setPromo(e.target.value)} onKeyDown={e => e.key === 'Enter' && applyPromo()} placeholder="Promo code" className="flex-1 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium outline-none focus:border-primary transition-all" />
+                      <button onClick={applyPromo} className="px-4 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold hover:bg-black transition">Apply</button>
+                    </div>
+                  )}
+
+                  <Link href="/checkout" className="block w-full py-4 text-center rounded-xl font-bold text-white no-underline transition-all hover:opacity-90 shadow-lg" style={{ backgroundColor: '#4169e1' }}>
+                    <span className="flex items-center justify-center gap-2"><span className="material-symbols-outlined select-none">lock</span> Secure Checkout</span>
+                  </Link>
+
+                  <div className="flex items-center justify-center gap-2 mt-4">
+                    {['visa', 'mastercard', 'upi', 'netbanking'].map(m => (
+                      <span key={m} className="px-2 py-1 bg-slate-100 text-[10px] font-extrabold text-slate-500 rounded uppercase tracking-wider">{m}</span>
+                    ))}
+                  </div>
+                  <p className="text-center text-[11px] text-slate-400 mt-3 flex items-center justify-center gap-1">
+                    <span className="material-symbols-outlined text-xs select-none">verified_user</span> 256-bit SSL Secured Checkout
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </main>
+
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 flex items-center justify-around px-4 py-3 z-50">
+          <Link href="/" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">home</span><span className="text-[10px] font-bold">Home</span></Link>
+          <Link href="/products" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">search</span><span className="text-[10px] font-bold">Shop</span></Link>
+          <Link href="/wishlist" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">favorite</span><span className="text-[10px] font-bold">Wishlist</span></Link>
+          <Link href="/orders" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">package</span><span className="text-[10px] font-bold">Orders</span></Link>
+          <Link href="/account" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">person</span><span className="text-[10px] font-bold">Profile</span></Link>
+        </nav>
       </div>
     </>
   );
