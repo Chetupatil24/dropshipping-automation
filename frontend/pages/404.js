@@ -1,11 +1,16 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Navbar from '../components/Navbar';
+import SiteFooter from '../components/SiteFooter';
+import BottomNav from '../components/BottomNav';
 
 export default function Custom404() {
   return (
     <>
       <Head><title>404 - Page Not Found | RUTHAN</title></Head>
-      <div className="min-h-screen bg-background-light flex flex-col items-center justify-center px-6 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="min-h-screen bg-background-light flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center pb-24">
         <div className="text-[120px] font-extrabold leading-none" style={{ color: '#4169e1', opacity: 0.12 }}>404</div>
         <div className="mt-[-40px] mb-6">
           <span className="material-symbols-outlined text-6xl select-none" style={{ color: '#4169e1' }}>search_off</span>
@@ -23,6 +28,8 @@ export default function Custom404() {
           </Link>
         </div>
       </div>
+      <SiteFooter />
+      <BottomNav />
     </>
   );
 }

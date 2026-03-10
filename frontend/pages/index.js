@@ -5,6 +5,9 @@ import { useRouter } from 'next/router';
 import { productsAPI } from '../lib/api';
 import { useStore } from '../lib/store';
 import { toast } from 'react-hot-toast';
+import Navbar from '../components/Navbar';
+import SiteFooter from '../components/SiteFooter';
+import BottomNav from '../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
 const toMRP = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
@@ -28,11 +31,9 @@ const TRENDING = [
 
 export default function Home() {
   const router = useRouter();
-  const { addToCart, getCartCount } = useStore();
+  const { addToCart } = useStore();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -44,17 +45,12 @@ export default function Home() {
     })();
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (search.trim()) router.push(\`/products?search=\${encodeURIComponent(search)}\`);
-  };
 
   const handleAddToCart = (product) => {
     addToCart(product);
     toast.success(\`\${product.name} added to cart!\`);
   };
 
-  const cartCount = getCartCount();
 
   return (
     <>
@@ -66,50 +62,8 @@ export default function Home() {
       <div className="bg-background-light text-slate-900 antialiased min-h-screen">
 
         {/* HEADER */}
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="material-symbols-outlined text-slate-700 md:hidden cursor-pointer select-none">menu</button>
-              <nav className="hidden md:flex gap-6 text-sm font-semibold">
-                <Link href="/products?category=Lady" className="hover:text-primary transition-colors text-slate-700">Women</Link>
-                <Link href="/products?category=Men" className="hover:text-primary transition-colors text-slate-700">Men</Link>
-                <Link href="/products?category=Accessories" className="hover:text-primary transition-colors text-slate-700">Accessories</Link>
-                <Link href="/products" className="hover:text-primary transition-colors text-slate-700">All Products</Link>
-              </nav>
-            </div>
-            <Link href="/" className="text-2xl font-extrabold tracking-tighter text-primary no-underline">RUTHAN</Link>
-            <div className="flex items-center gap-4">
-              <form onSubmit={handleSearch} className="hidden lg:flex items-center bg-slate-100 rounded-full px-4 py-2 w-52">
-                <span className="material-symbols-outlined text-slate-400 text-[20px] mr-1 select-none">search</span>
-                <input value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent border-none focus:outline-none text-sm w-full placeholder:text-slate-400" placeholder="Search..." />
-              </form>
-              <Link href="/wishlist" className="no-underline hidden sm:block">
-                <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">favorite</span>
-              </Link>
-              <Link href="/account" className="no-underline">
-                <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">person</span>
-              </Link>
-              <Link href="/cart" className="relative no-underline">
-                <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">shopping_bag</span>
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
-                )}
-              </Link>
-            </div>
-          </div>
-          {mobileMenuOpen && (
-            <div className="md:hidden bg-white border-t border-slate-100 px-6 py-4 space-y-3">
-              <Link href="/products?category=Lady" className="block text-sm font-semibold text-slate-700 hover:text-primary">Women</Link>
-              <Link href="/products?category=Men" className="block text-sm font-semibold text-slate-700 hover:text-primary">Men</Link>
-              <Link href="/products?category=Accessories" className="block text-sm font-semibold text-slate-700 hover:text-primary">Accessories</Link>
-              <Link href="/products" className="block text-sm font-semibold text-slate-700 hover:text-primary">All Products</Link>
-              <form onSubmit={handleSearch} className="flex items-center bg-slate-100 rounded-full px-4 py-2">
-                <span className="material-symbols-outlined text-slate-400 text-[20px] mr-1 select-none">search</span>
-                <input value={search} onChange={e => setSearch(e.target.value)} className="bg-transparent border-none focus:outline-none text-sm w-full placeholder:text-slate-400" placeholder="Search..." />
-              </form>
-            </div>
-          )}
-        </header>
+
+        <Navbar />
 
         <main className="max-w-7xl mx-auto pb-24">
           {/* HERO */}
@@ -238,85 +192,12 @@ export default function Home() {
         </main>
 
         {/* FOOTER */}
-        <footer className="bg-white border-t pt-16 pb-20 md:pb-12 px-6" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            <div>
-              <h2 className="text-2xl font-extrabold text-primary mb-4">RUTHAN</h2>
-              <p className="text-slate-500 mb-5 leading-relaxed text-sm">India's premium fashion destination. Quality, trusted sellers, fast delivery.</p>
-              <div className="flex gap-3">
-                {['public', 'share', 'mail'].map(icon => (
-                  <a key={icon} className="w-9 h-9 rounded-full border flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all text-slate-600 no-underline" style={{ borderColor: 'rgba(65,105,225,0.2)' }} href="#">
-                    <span className="material-symbols-outlined text-sm select-none">{icon}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Collections</h4>
-              <ul className="space-y-3 text-slate-500 text-sm">
-                <li><Link href="/products?category=Lady" className="hover:text-primary transition-colors">Women's Fashion</Link></li>
-                <li><Link href="/products?category=Jewelry" className="hover:text-primary transition-colors">Fine Jewelry</Link></li>
-                <li><Link href="/products?category=Shoes" className="hover:text-primary transition-colors">Footwear</Link></li>
-                <li><Link href="/products?category=Accessories" className="hover:text-primary transition-colors">Accessories</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Client Services</h4>
-              <ul className="space-y-3 text-slate-500 text-sm">
-                <li><Link href="/track" className="hover:text-primary transition-colors">Track Your Order</Link></li>
-                <li><Link href="/returns" className="hover:text-primary transition-colors">Returns & Refunds</Link></li>
-                <li><Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
-                <li><Link href="/orders" className="hover:text-primary transition-colors">My Orders</Link></li>
-                <li><Link href="/account" className="hover:text-primary transition-colors">My Account</Link></li>
-                <li><Link href="/login" className="hover:text-primary transition-colors">Login / Register</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Newsletter</h4>
-              <p className="text-slate-500 text-sm mb-4">Subscribe for first access to new arrivals and exclusive deals.</p>
-              <form className="space-y-3" onSubmit={e => e.preventDefault()}>
-                <input className="w-full bg-slate-100 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:outline-none" style={{ outlineColor: '#4169e1' }} placeholder="Email Address" type="email" />
-                <button className="w-full bg-slate-900 text-white font-bold py-3 rounded-lg text-sm hover:bg-black transition-all">Join RUTHAN Insider</button>
-              </form>
-            </div>
-          </div>
-          <div className="max-w-7xl mx-auto mt-12 pt-6 border-t text-center text-slate-400 text-xs" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
-            <div className="flex items-center justify-center gap-4 flex-wrap mb-3">
-              <Link href="/about" className="hover:text-primary transition-colors no-underline">About Us</Link>
-              <Link href="/contact" className="hover:text-primary transition-colors no-underline">Contact</Link>
-              <Link href="/faq" className="hover:text-primary transition-colors no-underline">FAQ</Link>
-              <Link href="/returns" className="hover:text-primary transition-colors no-underline">Returns</Link>
-              <Link href="/shipping-policy" className="hover:text-primary transition-colors no-underline">Shipping Policy</Link>
-              <Link href="/privacy" className="hover:text-primary transition-colors no-underline">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-primary transition-colors no-underline">Terms of Service</Link>
-            </div>
-            © 2025 RUTHAN. All rights reserved.
-          </div>
-        </footer>
+
+        <SiteFooter />
 
         {/* BOTTOM MOBILE NAV */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t flex items-center justify-around px-4 py-3 z-50" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
-          <Link href="/" className="flex flex-col items-center gap-0.5 text-primary no-underline">
-            <span className="material-symbols-outlined fill-1 select-none">home</span>
-            <span className="text-[10px] font-bold">Home</span>
-          </Link>
-          <Link href="/products" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
-            <span className="material-symbols-outlined select-none">search</span>
-            <span className="text-[10px] font-bold">Shop</span>
-          </Link>
-          <Link href="/wishlist" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
-            <span className="material-symbols-outlined select-none">favorite</span>
-            <span className="text-[10px] font-bold">Wishlist</span>
-          </Link>
-          <Link href="/orders" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
-            <span className="material-symbols-outlined select-none">package</span>
-            <span className="text-[10px] font-bold">Orders</span>
-          </Link>
-          <Link href="/account" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline">
-            <span className="material-symbols-outlined select-none">person</span>
-            <span className="text-[10px] font-bold">Profile</span>
-          </Link>
-        </nav>
+
+        <BottomNav />
       </div>
     </>
   );

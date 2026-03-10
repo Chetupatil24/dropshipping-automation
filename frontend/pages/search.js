@@ -5,19 +5,21 @@ import { useRouter } from 'next/router';
 import { productsAPI } from '../lib/api';
 import { useStore } from '../lib/store';
 import { toast } from 'react-hot-toast';
+import Navbar from '../components/Navbar';
+import SiteFooter from '../components/SiteFooter';
+import BottomNav from '../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
 const toMRP  = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
 
 export default function SearchPage() {
   const router = useRouter();
-  const { addToCart, getCartCount, toggleWishlist, isWishlisted } = useStore();
+  const { addToCart, toggleWishlist, isWishlisted } = useStore();
   const [query, setQuery] = useState('');
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [sort, setSort] = useState('');
-  const cartCount = getCartCount();
 
   const fetchResults = useCallback(async (q, s) => {
     if (!q) return;
@@ -61,30 +63,8 @@ export default function SearchPage() {
       <Head><title>{query ? `"${query}" — Search | RUTHAN` : 'Search | RUTHAN'}</title></Head>
       <div className="min-h-screen bg-background-light" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
         {/* Header */}
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">
-            <Link href="/" className="text-xl font-extrabold tracking-tighter no-underline flex-shrink-0" style={{ color: '#4169e1' }}>RUTHAN</Link>
-            {/* Search bar */}
-            <form onSubmit={handleSearch} className="flex-1 flex gap-2 max-w-2xl mx-auto">
-              <div className="relative flex-1">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-sm select-none">search</span>
-                <input
-                  value={query} onChange={e => setQuery(e.target.value)}
-                  placeholder="Search products, brands..."
-                  className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-sm font-medium outline-none focus:border-primary transition-all bg-white"
-                />
-              </div>
-              <button type="submit" className="px-5 py-2.5 rounded-xl font-bold text-white text-sm flex-shrink-0" style={{ backgroundColor: '#4169e1' }}>Search</button>
-            </form>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <Link href="/wishlist" className="hidden sm:block no-underline"><span className="material-symbols-outlined text-slate-600 hover:text-primary transition-colors select-none">favorite</span></Link>
-              <Link href="/cart" className="relative no-underline">
-                <span className="material-symbols-outlined text-slate-600 hover:text-primary transition-colors select-none">shopping_bag</span>
-                {cartCount > 0 && <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{cartCount}</span>}
-              </Link>
-            </div>
-          </div>
-        </header>
+
+        <Navbar />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           {/* Results summary + sort */}
@@ -184,13 +164,9 @@ export default function SearchPage() {
           )}
         </main>
 
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 flex items-center justify-around px-4 py-3 z-50">
-          <Link href="/" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">home</span><span className="text-[10px] font-bold">Home</span></Link>
-          <Link href="/search" className="flex flex-col items-center gap-0.5 text-primary no-underline"><span className="material-symbols-outlined select-none fill-1">search</span><span className="text-[10px] font-bold">Search</span></Link>
-          <Link href="/wishlist" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">favorite</span><span className="text-[10px] font-bold">Wishlist</span></Link>
-          <Link href="/orders" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">package_2</span><span className="text-[10px] font-bold">Orders</span></Link>
-          <Link href="/account" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">person</span><span className="text-[10px] font-bold">Profile</span></Link>
-        </nav>
+
+        <SiteFooter />
+        <BottomNav />
       </div>
     </>
   );

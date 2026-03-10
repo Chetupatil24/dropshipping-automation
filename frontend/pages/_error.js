@@ -1,11 +1,16 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Navbar from '../components/Navbar';
+import SiteFooter from '../components/SiteFooter';
+import BottomNav from '../components/BottomNav';
 
 export default function Error({ statusCode }) {
   return (
     <>
       <Head><title>{statusCode ? `${statusCode} Error` : 'Error'} | RUTHAN</title></Head>
-      <div className="min-h-screen bg-background-light flex flex-col items-center justify-center px-6 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="min-h-screen bg-background-light flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <Navbar />
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center pb-24">
         <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
           <span className="material-symbols-outlined text-4xl text-red-500 select-none">error</span>
         </div>
@@ -18,7 +23,10 @@ export default function Error({ statusCode }) {
         <Link href="/" className="px-8 py-3 rounded-xl font-bold text-white no-underline hover:opacity-90 transition-all shadow" style={{ backgroundColor: '#4169e1' }}>
           Go Home
         </Link>
+        </div>
       </div>
+      <SiteFooter />
+      <BottomNav />
     </>
   );
 }

@@ -1,5 +1,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import Navbar from '../components/Navbar';
+import SiteFooter from '../components/SiteFooter';
+import BottomNav from '../components/BottomNav';
 
 export default function AboutPage() {
   const VALUES = [
@@ -15,15 +18,8 @@ export default function AboutPage() {
     <>
       <Head><title>About Us | RUTHAN</title></Head>
       <div className="min-h-screen bg-background-light" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
-          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-extrabold tracking-tighter no-underline" style={{ color: '#4169e1' }}>RUTHAN</Link>
-            <div className="flex items-center gap-4">
-              <Link href="/contact" className="text-sm font-semibold text-slate-600 hover:text-primary no-underline transition-colors hidden sm:block">Contact</Link>
-              <Link href="/cart" className="no-underline"><span className="material-symbols-outlined text-slate-600 hover:text-primary transition-colors select-none">shopping_bag</span></Link>
-            </div>
-          </div>
-        </header>
+
+        <Navbar />
 
         <main>
           {/* Hero */}
@@ -97,13 +93,9 @@ export default function AboutPage() {
           </section>
         </main>
 
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 flex items-center justify-around px-4 py-3 z-50">
-          <Link href="/" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">home</span><span className="text-[10px] font-bold">Home</span></Link>
-          <Link href="/products" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">search</span><span className="text-[10px] font-bold">Shop</span></Link>
-          <Link href="/wishlist" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">favorite</span><span className="text-[10px] font-bold">Wishlist</span></Link>
-          <Link href="/orders" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">package_2</span><span className="text-[10px] font-bold">Orders</span></Link>
-          <Link href="/account" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">person</span><span className="text-[10px] font-bold">Profile</span></Link>
-        </nav>
+
+        <SiteFooter />
+        <BottomNav />
       </div>
     </>
   );
