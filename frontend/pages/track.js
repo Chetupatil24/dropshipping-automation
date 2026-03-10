@@ -2,327 +2,209 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { ordersAPI } from '../lib/api';
 import { toast } from 'react-hot-toast';
-import { FiPackage, FiTruck, FiMapPin, FiCalendar, FiRefreshCw, FiCheckCircle, FiClock } from 'react-icons/fi';
-import Footer from '../components/Footer';
 
-export default function TrackOrder() {
-    const router = useRouter();
-    const [orderNumber, setOrderNumber] = useState('');
-    const [tracking, setTracking] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [autoRefresh, setAutoRefresh] = useState(false);
+const STATUS_STEPS = [
+  { key: 'pending',    icon: 'receipt_long',    label: 'Order Placed',      desc: 'Your order has been received.' },
+  { key: 'confirmed',  icon: 'check_circle',    label: 'Order Confirmed',   desc: 'Your order has been confirmed.' },
+  { key: 'processing', icon: 'inventory_2',     label: 'Processing',        desc: 'Your order is being prepared.' },
+  { key: 'shipped',    icon: 'local_shipping',  label: 'Shipped',           desc: 'Your order is on the way.' },
+  { key: 'delivered',  icon: 'package_2',       label: 'Delivered',         desc: 'Your order has been delivered.' },
+];
 
-    useEffect(() => {
-        // If order number in URL query, auto-fetch
-        if (router.query.order) {
-            setOrderNumber(router.query.order);
-            fetchTracking(router.query.order);
-        }
-    }, [router.query]);
+export default function TrackPage() {
+  const router = useRouter();
+  const [input, setInput] = useState('');
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
 
-    useEffect(() => {
-        let interval;
-        if (autoRefresh && tracking) {
-            // Auto-refresh every 60 seconds
-            interval = setInterval(() => {
-                fetchTracking(orderNumber, true);
-            }, 60000);
-        }
-        return () => clearInterval(interval);
-    }, [autoRefresh, tracking, orderNumber]);
+  // Auto-search if orderId is in query params
+  useEffect(() => {
+    if (router.isReady && router.query.orderId) {
+      setInput(router.query.orderId);
+      doSearch(router.query.orderId);
+    }
+  }, [router.isReady, router.query.orderId]);
 
-    const fetchTracking = async (orderNum, silent = false) => {
-        if (!orderNum) {
-            toast.error('Please enter an order number');
-            return;
-        }
+  const doSearch = async (id) => {
+    const searchId = id || input.trim();
+    if (!searchId) { toast.error('Enter an Order ID'); return; }
+    setLoading(true);
+    setSearched(true);
+    try {
+      const res = await ordersAPI.getById(searchId);
+      setOrder(res.data.order || res.data);
+    } catch {
+      setOrder(null);
+      toast.error('Order not found. Check the Order ID and try again.');
+    } finally { setLoading(false); }
+  };
 
-        setLoading(true);
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tracking/public/${orderNum}`);
-            const data = await response.json();
+  const currentStep = order ? STATUS_STEPS.findIndex(s => s.key === order.status) : -1;
+  const history = order?.orderTrackingHistory || order?.trackingHistory || [];
 
-            if (data.success) {
-                setTracking(data.data);
-                if (!silent) {
-                    toast.success('Tracking information loaded!');
-                }
-            } else {
-                setTracking(null);
-                toast.error(data.error || 'Order not found');
-            }
-        } catch (error) {
-            console.error('Tracking error:', error);
-            toast.error('Failed to fetch tracking information');
-            setTracking(null);
-        } finally {
-            setLoading(false);
-        }
-    };
+  return (
+    <>
+      <Head><title>Track Order | RUTHAN</title></Head>
+      <div className="min-h-screen bg-background-light" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 text-slate-600 hover:text-primary text-sm font-semibold no-underline transition-colors">
+              <span className="material-symbols-outlined text-sm select-none">arrow_back</span> Home
+            </Link>
+            <Link href="/" className="text-2xl font-extrabold tracking-tighter no-underline" style={{ color: '#4169e1' }}>RUTHAN</Link>
+            <Link href="/cart" className="relative no-underline">
+              <span className="material-symbols-outlined text-slate-700 hover:text-primary transition-colors select-none">shopping_bag</span>
+            </Link>
+          </div>
+        </header>
 
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'delivered': return <FiCheckCircle className="text-green-500" />;
-            case 'shipped':
-            case 'out_for_delivery': return <FiTruck className="text-blue-600" />;
-            case 'processing': return <FiClock className="text-blue-500" />;
-            default: return <FiPackage className="text-gray-500" />;
-        }
-    };
-
-    const getStatusText = (status) => {
-        const statusMap = {
-            'pending': 'Order Placed',
-            'processing': 'Processing',
-            'shipped': 'Shipped',
-            'out_for_delivery': 'Out for Delivery',
-            'delivered': 'Delivered'
-        };
-        return statusMap[status] || status;
-    };
-
-    const getProgressPercentage = (status) => {
-        const progress = {
-            'pending': 25,
-            'processing': 50,
-            'shipped': 75,
-            'out_for_delivery': 90,
-            'delivered': 100
-        };
-        return progress[status] || 0;
-    };
-
-    return (
-        <>
-            <Head>
-                <title>Track Your Order - Ruthan | The Shopping Spot</title>
-                <meta name="description" content="Track your Ruthan order in real-time at The Shopping Spot" />
-            </Head>
-
-            <div className="min-h-screen bg-gradient-to-b from-purple-50 via-pink-50 to-white">
-                {/* Header */}
-                <header className="bg-gradient-to-r from-blue-600 via-teal-500 to-blue-800 shadow-lg py-6">
-                    <div className="container mx-auto px-4">
-                        <Link href="/" className="flex flex-col">
-                            <span className="text-3xl font-extrabold text-white tracking-tight">RUTHAN</span>
-                            <span className="text-xs text-purple-200 italic">The Shopping Spot</span>
-                        </Link>
-                    </div>
-                </header>
-
-                <div className="container mx-auto px-4 py-12 max-w-4xl">
-                    {/* Page Header */}
-                    <div className="text-center mb-12">
-                        <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
-                            Track Your Order
-                        </h1>
-                        <p className="text-gray-600 text-lg">Enter your order number to see real-time tracking</p>
-                    </div>
-
-                    {/* Search Form */}
-                    <div className="bg-white rounded-2xl shadow-2xl p-8 mb-8">
-                        <div className="flex gap-4">
-                            <input
-                                type="text"
-                                value={orderNumber}
-                                onChange={(e) => setOrderNumber(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && fetchTracking(orderNumber)}
-                                placeholder="Enter your order number (e.g., ORD-12345)"
-                                className="flex-1 px-6 py-4 border-2 border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent text-lg"
-                            />
-                            <button
-                                onClick={() => fetchTracking(orderNumber)}
-                                disabled={loading}
-                                className="bg-gradient-to-r from-blue-600 to-teal-600 text-white px-10 py-4 rounded-full font-extrabold hover:from-teal-600 hover:to-secondary transition-all disabled:opacity-50 flex items-center gap-2"
-                           >
-                                {loading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                                        Tracking...
-                                    </>
-                                ) : (
-                                    <>
-                                        <FiPackage />
-                                        Track Order
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Tracking Results */}
-                    {tracking && (
-                        <div className="space-y-6">
-                            {/* Status Card */}
-                            <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-900 rounded-2xl p-8 text-white shadow-2xl">
-                                <div className="flex items-center justify-between mb-6">
-                                    <div>
-                                        <p className="text-sm opacity-90">Order Number</p>
-                                        <h2 className="text-3xl font-extrabold">{tracking.orderNumber}</h2>
-                                    </div>
-                                    <div className="text-6xl">
-                                        {getStatusIcon(tracking.status)}
-                                    </div>
-                                </div>
-
-                                {/* Progress Bar */}
-                                <div className="mb-6">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-2xl font-bold">{getStatusText(tracking.status)}</span>
-                                        <button
-                                            onClick={() => {
-                                                fetchTracking(orderNumber, true);
-                                                toast.success('Refreshed!');
-                                            }}
-                                            className="bg-white/20 backdrop-blur-md p-2 rounded-full hover:bg-white/30 transition-all"
-                                       >
-                                            <FiRefreshCw className="text-xl" />
-                                        </button>
-                                    </div>
-                                    <div className="bg-white/20 rounded-full h-3 overflow-hidden">
-                                        <div
-                                            className="bg-white h-full transition-all duration-500"
-                                            style={{ width: `${getProgressPercentage(tracking.status)}%` }}
-                                       ></div>
-                                    </div>
-                                </div>
-
-                                {/* Quick Info */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    {tracking.trackingNumber && (
-                                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4">
-                                            <p className="text-sm opacity-90 mb-1">Tracking Number</p>
-                                            <p className="font-bold text-lg">{tracking.trackingNumber}</p>
-                                        </div>
-                                    )}
-                                    {tracking.carrier && (
-                                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4">
-                                            <p className="text-sm opacity-90 mb-1">Carrier</p>
-                                            <p className="font-bold text-lg">{tracking.carrier}</p>
-                                        </div>
-                                    )}
-                                    {tracking.currentLocation && (
-                                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 col-span-2">
-                                            <p className="text-sm opacity-90 mb-1 flex items-center gap-2">
-                                                <FiMapPin /> Current Location
-                                            </p>
-                                            <p className="font-bold text-lg">{tracking.currentLocation}</p>
-                                        </div>
-                                    )}
-                                    {tracking.estimatedDelivery && (
-                                        <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 col-span-2">
-                                            <p className="text-sm opacity-90 mb-1 flex items-center gap-2">
-                                                <FiCalendar /> Estimated Delivery
-                                            </p>
-                                            <p className="font-bold text-lg">
-                                                {new Date(tracking.estimatedDelivery).toLocaleDateString('en-IN', {
-                                                    weekday: 'long',
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric'
-                                                })}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* External Tracking Link */}
-                                {tracking.trackingUrl && (
-                                    <div className="mt-6">
-                                        <a
-                                            href={tracking.trackingUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full block text-center bg-white text-blue-700 px-6 py-3 rounded-full font-bold hover:scale-105 transition-all"
-                                       >
-                                            Track on {tracking.carrier} Website →
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Auto Refresh Toggle */}
-                            <div className="bg-white rounded-2xl shadow-lg p-6">
-                                <label className="flex items-center justify-between cursor-pointer">
-                                    <span className="font-bold text-gray-800">Auto-refresh every 60 seconds</span>
-                                    <input
-                                        type="checkbox"
-                                        checked={autoRefresh}
-                                        onChange={(e) => setAutoRefresh(e.target.checked)}
-                                        className="w-12 h-6 appearance-none bg-gray-300 rounded-full relative cursor-pointer transition-colors checked:bg-purple-600"
-                                    />
-                                </label>
-                            </div>
-
-                            {/* Timeline */}
-                            {tracking.history && tracking.history.length> 0 && (
-                                <div className="bg-white rounded-2xl shadow-lg p-8">
-                                    <h3 className="text-2xl font-extrabold mb-6 flex items-center gap-2">
-                                        <FiTruck className="text-blue-700" />
-                                        Tracking Timeline
-                                    </h3>
-                                    <div className="space-y-4">
-                                        {tracking.history.map((event, index) => (
-                                            <div key={index} className="flex gap-4">
-                                                <div className="flex flex-col items-center">
-                                                    <div className={`w-4 h-4 rounded-full ${index === 0 ? 'bg-purple-600' : 'bg-gray-300'}`}></div>
-                                                    {index <tracking.history.length - 1 && (
-                                                        <div className="w-0.5 h-full bg-gray-200 my-1"></div>
-                                                    )}
-                                                </div>
-                                                <div className="flex-1 pb-6">
-                                                    <div className="flex items-start justify-between">
-                                                        <div>
-                                                            <p className="font-bold text-gray-800">{event.description}</p>
-                                                            {event.location && (
-                                                                <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
-                                                                    <FiMapPin className="text-xs" />
-                                                                    {event.location}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                        <p className="text-sm text-gray-500">
-                                                            {new Date(event.timestamp).toLocaleString('en-IN')}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <Footer />
+        <main className="max-w-2xl mx-auto px-6 py-14">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ backgroundColor: 'rgba(65,105,225,0.08)' }}>
+              <span className="material-symbols-outlined text-3xl select-none" style={{ color: '#4169e1' }}>location_on</span>
             </div>
+            <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Track Your Order</h1>
+            <p className="text-slate-500 text-sm">Enter your Order ID to get real-time status updates.</p>
+          </div>
 
-            <style jsx>{`
-        input[type="checkbox"]:checked::before {
-          content: '';
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: white;
-          top: 2px;
-          right: 2px;
-          transition: all 0.3s;
-        }
-        input[type="checkbox"]::before {
-          content: '';
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: white;
-          top: 2px;
-          left: 2px;
-          transition: all 0.3s;
-        }
-      `}</style>
-        </>
-    );
+          {/* Search */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Order ID</label>
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 text-sm select-none">search</span>
+                <input
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && doSearch()}
+                  placeholder="e.g. A1B2C3D4"
+                  className="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-sm font-medium outline-none focus:border-primary transition-all bg-white"
+                />
+              </div>
+              <button
+                onClick={() => doSearch()}
+                disabled={loading}
+                className="px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90 disabled:opacity-60 flex items-center gap-2 flex-shrink-0"
+                style={{ backgroundColor: '#4169e1' }}
+              >
+                {loading ? <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" /> : <span className="material-symbols-outlined text-sm select-none">search</span>}
+                {loading ? 'Searching...' : 'Track'}
+              </button>
+            </div>
+          </div>
+
+          {/* Results */}
+          {searched && !loading && !order && (
+            <div className="bg-white rounded-2xl border border-red-100 p-8 text-center">
+              <span className="material-symbols-outlined text-5xl text-red-300 select-none mb-3 block">search_off</span>
+              <p className="font-bold text-slate-700">Order not found</p>
+              <p className="text-sm text-slate-400 mt-1">Double-check your Order ID and try again.</p>
+            </div>
+          )}
+
+          {order && (
+            <div className="space-y-6">
+              {/* Order card */}
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                  <h2 className="font-extrabold text-slate-900">Order #{String(order.id).slice(0,8).toUpperCase()}</h2>
+                  <span className="px-3 py-1.5 rounded-xl text-xs font-extrabold capitalize" style={{ backgroundColor: 'rgba(65,105,225,0.1)', color: '#4169e1' }}>
+                    {order.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400">Placed on {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                {order.trackingNumber && (
+                  <div className="mt-3 p-3 bg-slate-50 rounded-xl">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tracking Number</p>
+                    <p className="font-extrabold text-slate-900">{order.trackingNumber}</p>
+                    {order.courier && <p className="text-xs text-slate-400 mt-0.5">{order.courier}</p>}
+                  </div>
+                )}
+              </div>
+
+              {/* Progress tracker */}
+              {order.status !== 'cancelled' && (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                  <h3 className="font-extrabold text-slate-900 mb-6">Order Progress</h3>
+                  <div className="space-y-0">
+                    {STATUS_STEPS.map((step, i) => {
+                      const done = i <= currentStep;
+                      const active = i === currentStep;
+                      return (
+                        <div key={step.key} className="flex gap-4">
+                          {/* Timeline */}
+                          <div className="flex flex-col items-center">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${done ? 'text-white shadow-sm' : 'bg-slate-100 text-slate-400'}`} style={done ? { backgroundColor: '#4169e1' } : {}}>
+                              <span className={`material-symbols-outlined text-lg select-none ${done ? 'fill-1' : ''}`}>{step.icon}</span>
+                            </div>
+                            {i < STATUS_STEPS.length - 1 && (
+                              <div className={`w-0.5 h-8 rounded-full my-1 ${done && i < currentStep ? '' : 'bg-slate-100'}`} style={done && i < currentStep ? { backgroundColor: '#4169e1' } : {}} />
+                            )}
+                          </div>
+                          {/* Content */}
+                          <div className="flex-1 pb-4">
+                            <p className={`font-bold text-sm ${done ? 'text-slate-900' : 'text-slate-400'}`}>{step.label}</p>
+                            <p className={`text-xs mt-0.5 ${active ? 'text-primary font-semibold' : done ? 'text-slate-500' : 'text-slate-300'}`}>{step.desc}</p>
+                          </div>
+                          {active && <div className="flex-shrink-0"><span className="px-2 py-1 rounded-full text-[10px] font-extrabold text-white" style={{ backgroundColor: '#4169e1' }}>Current</span></div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {order.status === 'cancelled' && (
+                <div className="bg-red-50 rounded-2xl border border-red-100 p-6 text-center">
+                  <span className="material-symbols-outlined text-4xl text-red-400 select-none mb-2 block">cancel</span>
+                  <p className="font-extrabold text-red-600">Order Cancelled</p>
+                  {order.cancellationReason && <p className="text-sm text-red-400 mt-1">{order.cancellationReason}</p>}
+                </div>
+              )}
+
+              {/* Timeline history */}
+              {history.length > 0 && (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                  <h3 className="font-extrabold text-slate-900 mb-5">Activity Log</h3>
+                  <div className="space-y-4">
+                    {history.map((h, i) => (
+                      <div key={i} className="flex gap-4">
+                        <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ backgroundColor: '#4169e1' }} />
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">{h.status || h.event}</p>
+                          {h.description && <p className="text-xs text-slate-500 mt-0.5">{h.description}</p>}
+                          {h.createdAt && <p className="text-xs text-slate-400 mt-0.5">{new Date(h.createdAt).toLocaleString('en-IN')}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <Link href={`/orders/${order.id}`} className="flex-1 py-3 rounded-xl font-bold text-center text-white no-underline hover:opacity-90 transition-all" style={{ backgroundColor: '#4169e1' }}>
+                  View Full Order
+                </Link>
+                <Link href="/products" className="flex-1 py-3 rounded-xl font-bold text-center text-slate-700 bg-white border border-slate-200 no-underline hover:border-primary transition-all">
+                  Continue Shopping
+                </Link>
+              </div>
+            </div>
+          )}
+        </main>
+
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-slate-200 flex items-center justify-around px-4 py-3 z-50">
+          <Link href="/" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">home</span><span className="text-[10px] font-bold">Home</span></Link>
+          <Link href="/products" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">search</span><span className="text-[10px] font-bold">Shop</span></Link>
+          <Link href="/wishlist" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">favorite</span><span className="text-[10px] font-bold">Wishlist</span></Link>
+          <Link href="/orders" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">package_2</span><span className="text-[10px] font-bold">Orders</span></Link>
+          <Link href="/account" className="flex flex-col items-center gap-0.5 text-slate-400 no-underline"><span className="material-symbols-outlined select-none">person</span><span className="text-[10px] font-bold">Profile</span></Link>
+        </nav>
+      </div>
+    </>
+  );
 }

@@ -1,32 +1,29 @@
-function Error({ statusCode }) {
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-            <div className="text-center p-8">
-                <h1 className="text-9xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                    {statusCode || '404'}
-                </h1>
-                <p className="text-2xl font-bold text-gray-800 mb-2">
-                    {statusCode
-                        ? `An error ${statusCode} occurred on server`
-                        : 'Page Not Found'}
-                </p>
-                <p className="text-gray-600 mb-8">
-                    Sorry, we could not find the page you are looking for.
-                </p>
-                <a
-                    href="/"
-                    className="inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-lg font-bold hover:from-orange-600 hover:to-red-600 transition-all hover:scale-105 shadow-lg"
-                >
-                    Go to Homepage
-                </a>
-            </div>
+import Head from 'next/head';
+import Link from 'next/link';
+
+export default function Error({ statusCode }) {
+  return (
+    <>
+      <Head><title>{statusCode ? `${statusCode} Error` : 'Error'} | RUTHAN</title></Head>
+      <div className="min-h-screen bg-background-light flex flex-col items-center justify-center px-6 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: 'rgba(239,68,68,0.1)' }}>
+          <span className="material-symbols-outlined text-4xl text-red-500 select-none">error</span>
         </div>
-    );
+        <h1 className="text-3xl font-extrabold text-slate-900 mb-3">
+          {statusCode ? `${statusCode} — Server Error` : 'An Error Occurred'}
+        </h1>
+        <p className="text-slate-500 max-w-md mb-8 text-sm leading-relaxed">
+          {statusCode === 404 ? "The page you're looking for doesn't exist." : "Something went wrong on our end. Please try again shortly."}
+        </p>
+        <Link href="/" className="px-8 py-3 rounded-xl font-bold text-white no-underline hover:opacity-90 transition-all shadow" style={{ backgroundColor: '#4169e1' }}>
+          Go Home
+        </Link>
+      </div>
+    </>
+  );
 }
 
 Error.getInitialProps = ({ res, err }) => {
-    const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
-    return { statusCode };
+  const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
+  return { statusCode };
 };
-
-export default Error;

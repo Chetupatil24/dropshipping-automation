@@ -1,80 +1,28 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { FiHome, FiSearch } from 'react-icons/fi';
 
 export default function Custom404() {
-    return (
-        <>
-            <Head>
-                <title>Page Not Found - Ruthan | The Shopping Spot</title>
-            </Head>
-
-            <div className="min-h-screen bg-gradient-to-b from-purple-50 via-pink-50 to-white flex items-center justify-center px-4">
-                <div className="text-center max-w-2xl">
-                    {/* Animated 404 */}
-                    <div className="mb-8 relative">
-                        <div className="absolute inset-0 blur-3xl opacity-30">
-                            <div className="w-64 h-64 bg-gradient-to-r from-blue-600 to-teal-600 rounded-full mx-auto animate-pulse"></div>
-                        </div>
-                        <h1 className="text-9xl font-extrabold bg-gradient-to-r from-blue-600 via-blue-700 to-purple-900 bg-clip-text text-transparent relative animate-float">
-                            404
-                        </h1>
-                    </div>
-
-                    {/* Message */}
-                    <h2 className="text-4xl font-extrabold mb-4 text-gray-800">
-                        Oops! Page Not Found
-                    </h2>
-                    <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-                        The page you're looking for seems to have wandered off.
-                        <br />Don't worry, our best products are still waiting for you!
-                    </p>
-
-                    {/* Actions */}
-                    <div className="flex gap-4 justify-center flex-wrap">
-                        <Link
-                            href="/"
-                            className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-full font-extrabold hover:from-teal-600 hover:to-secondary transition-all hover:scale-105 shadow-2xl"
-                        >
-                            <FiHome />
-                            Go Home
-                        </Link>
-                        <Link
-                            href="/products"
-                            className="flex items-center gap-2 px-8 py-4 bg-white border-2 border-purple-200 text-blue-700 rounded-full font-bold hover:bg-purple-50 transition-all"
-                        >
-                            <FiSearch />
-                            Browse Products
-                        </Link>
-                    </div>
-
-                    {/* Decorative Elements */}
-                    <div className="mt-16 grid grid-cols-3 gap-4 text-center">
-                        <div className="p-6 bg-white rounded-2xl shadow-lg">
-                            <div className="text-3xl mb-2">🛍️</div>
-                            <p className="font-bold text-blue-700">Premium Fashion</p>
-                        </div>
-                        <div className="p-6 bg-white rounded-2xl shadow-lg">
-                            <div className="text-3xl mb-2">🚚</div>
-                            <p className="font-bold text-pink-600">Fast Delivery</p>
-                        </div>
-                        <div className="p-6 bg-white rounded-2xl shadow-lg">
-                            <div className="text-3xl mb-2">💰</div>
-                            <p className="font-bold text-orange-600">COD Available</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
-        </>
-    );
+  return (
+    <>
+      <Head><title>404 - Page Not Found | RUTHAN</title></Head>
+      <div className="min-h-screen bg-background-light flex flex-col items-center justify-center px-6 text-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="text-[120px] font-extrabold leading-none" style={{ color: '#4169e1', opacity: 0.12 }}>404</div>
+        <div className="mt-[-40px] mb-6">
+          <span className="material-symbols-outlined text-6xl select-none" style={{ color: '#4169e1' }}>search_off</span>
+        </div>
+        <h1 className="text-3xl font-extrabold text-slate-900 mb-3">Page Not Found</h1>
+        <p className="text-slate-500 max-w-md mb-8 text-sm leading-relaxed">
+          The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link href="/" className="px-8 py-3 rounded-xl font-bold text-white no-underline hover:opacity-90 transition-all shadow" style={{ backgroundColor: '#4169e1' }}>
+            Go Home
+          </Link>
+          <Link href="/products" className="px-8 py-3 rounded-xl font-bold text-slate-700 bg-white border border-slate-200 no-underline hover:border-blue-300 transition-all">
+            Browse Products
+          </Link>
+        </div>
+      </div>
+    </>
+  );
 }
