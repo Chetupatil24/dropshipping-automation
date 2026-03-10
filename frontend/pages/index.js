@@ -264,6 +264,8 @@ export default function Home() {
               <h4 className="font-bold mb-5 uppercase tracking-wider text-sm">Client Services</h4>
               <ul className="space-y-3 text-slate-500 text-sm">
                 <li><Link href="/track" className="hover:text-primary transition-colors">Track Your Order</Link></li>
+                <li><Link href="/returns" className="hover:text-primary transition-colors">Returns & Refunds</Link></li>
+                <li><Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
                 <li><Link href="/orders" className="hover:text-primary transition-colors">My Orders</Link></li>
                 <li><Link href="/account" className="hover:text-primary transition-colors">My Account</Link></li>
                 <li><Link href="/login" className="hover:text-primary transition-colors">Login / Register</Link></li>
@@ -282,6 +284,8 @@ export default function Home() {
             <div className="flex items-center justify-center gap-4 flex-wrap mb-3">
               <Link href="/about" className="hover:text-primary transition-colors no-underline">About Us</Link>
               <Link href="/contact" className="hover:text-primary transition-colors no-underline">Contact</Link>
+              <Link href="/faq" className="hover:text-primary transition-colors no-underline">FAQ</Link>
+              <Link href="/returns" className="hover:text-primary transition-colors no-underline">Returns</Link>
               <Link href="/shipping-policy" className="hover:text-primary transition-colors no-underline">Shipping Policy</Link>
               <Link href="/privacy" className="hover:text-primary transition-colors no-underline">Privacy Policy</Link>
               <Link href="/terms" className="hover:text-primary transition-colors no-underline">Terms of Service</Link>
