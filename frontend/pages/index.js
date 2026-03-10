@@ -48,7 +48,7 @@ export default function Home() {
 
   const handleAddToCart = (product) => {
     addToCart(product);
-    toast.success(\`\${product.name} added to cart!\`);
+    toast.success(`\${product.name} added to cart!`);
   };
 
 
@@ -136,7 +136,7 @@ export default function Home() {
                     </div>
                     <div className="p-4">
                       <p className="text-[10px] text-slate-400 font-bold uppercase mb-1">{p.category || 'Fashion'}</p>
-                      <Link href={\`/products/\${p.slug || p.id}\`} className="no-underline">
+                      <Link href={`/products/\${p.slug || p.id}`} className="no-underline">
                         <h4 className="font-bold text-slate-800 mb-1 truncate text-sm hover:text-primary">{p.name}</h4>
                       </Link>
                       <div className="flex items-center justify-between">
