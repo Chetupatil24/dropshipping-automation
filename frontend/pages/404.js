@@ -28,6 +28,7 @@ export default function Custom404() {
           </Link>
         </div>
       </div>
+      </div>
       <SiteFooter />
       <BottomNav />
     </>
