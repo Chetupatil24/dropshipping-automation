@@ -27,7 +27,7 @@ export default function Custom404() {
             Browse Products
           </Link>
         </div>
-      </div>
+        </div>
       </div>
       <SiteFooter />
       <BottomNav />

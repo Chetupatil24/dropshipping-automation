@@ -25,7 +25,6 @@ export default function Error({ statusCode }) {
         </Link>
         </div>
       </div>
-      </div>
       <SiteFooter />
       <BottomNav />
     </>
