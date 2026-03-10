@@ -79,6 +79,9 @@ export default function LoginPage() {
                       <span className="material-symbols-outlined text-sm select-none">{showPass ? 'visibility_off' : 'visibility'}</span>
                     </button>
                   </div>
+                  <div className="flex justify-end mt-2">
+                    <Link href="/forgot-password" className="text-xs font-bold no-underline hover:opacity-80 transition-opacity" style={{ color: '#4169e1' }}>Forgot Password?</Link>
+                  </div>
                 </div>
 
                 <button

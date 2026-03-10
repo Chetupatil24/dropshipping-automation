@@ -36,6 +36,10 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  updatePassword: (data) => api.put('/auth/password', data),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (data) => api.post('/auth/reset-password', data),
 };
 
 // Products API
@@ -43,11 +47,14 @@ export const productsAPI = {
   getAll: (params) => api.get('/products', { params }),
   getById: (id) => api.get(`/products/${id}`),
   getBySlug: (slug) => api.get(`/products/slug/${slug}`),
+  getCategories: () => api.get('/products/categories'),
+  search: (query, params) => api.get('/products', { params: { search: query, ...params } }),
 };
 
 // Orders API
 export const ordersAPI = {
   create: (data) => api.post('/orders', data),
+  getAll: (params) => api.get('/orders/my-orders', { params }),
   getMyOrders: (params) => api.get('/orders/my-orders', { params }),
   getById: (id) => api.get(`/orders/${id}`),
   track: (id) => api.get(`/orders/${id}/track`),

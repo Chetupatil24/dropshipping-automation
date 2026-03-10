@@ -279,6 +279,13 @@ export default function Home() {
             </div>
           </div>
           <div className="max-w-7xl mx-auto mt-12 pt-6 border-t text-center text-slate-400 text-xs" style={{ borderColor: 'rgba(65,105,225,0.1)' }}>
+            <div className="flex items-center justify-center gap-4 flex-wrap mb-3">
+              <Link href="/about" className="hover:text-primary transition-colors no-underline">About Us</Link>
+              <Link href="/contact" className="hover:text-primary transition-colors no-underline">Contact</Link>
+              <Link href="/shipping-policy" className="hover:text-primary transition-colors no-underline">Shipping Policy</Link>
+              <Link href="/privacy" className="hover:text-primary transition-colors no-underline">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-primary transition-colors no-underline">Terms of Service</Link>
+            </div>
             © 2025 RUTHAN. All rights reserved.
           </div>
         </footer>

@@ -1,79 +1,51 @@
 import { useState, useEffect } from 'react';
 
-const MOCK_PURCHASES = [
-    { name: 'Rahul from Mumbai', product: 'Premium Hoodie', time: '2 minutes ago' },
-    { name: 'Priya from Delhi', product: 'Wireless Earbuds', time: '5 minutes ago' },
-    { name: 'Amit from Bangalore', product: 'Smart Watch', time: '12 minutes ago' },
-    { name: 'Sneha from Pune', product: 'Running Shoes', time: 'Just now' },
-    { name: 'Vikram from Hyderabad', product: 'Graphic T-Shirt', time: '1 hour ago' },
+const PRODUCTS = [
+  'Silk Wrap Dress', 'Gold Hoop Earrings', 'Minimalist Tote Bag',
+  'Pearl Necklace Set', 'Knit Oversized Hoodie', 'White Sneakers',
+  'Oud Perfume 50ml', 'Embroidered Kurta Set', 'Leather Wallet',
 ];
+const CITIES = ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Pune', 'Chennai', 'Kolkata', 'Jaipur', 'Ahmedabad', 'Surat'];
+const NAMES = ['Rahul S.', 'Priya K.', 'Ankit M.', 'Sneha R.', 'Vikram P.', 'Anjali D.', 'Rohan B.', 'Pooja N.', 'Arjun S.', 'Kavya T.'];
+const TIMES = ['Just now', '2 min ago', '5 min ago', '8 min ago', '12 min ago', '1 hour ago'];
+
+function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 export default function LiveSalesPopup() {
-    const [currentPurchase, setCurrentPurchase] = useState(null);
-    const [isVisible, setIsVisible] = useState(false);
+  const [popup, setPopup] = useState(null);
+  const [visible, setVisible] = useState(false);
 
-    useEffect(() => {
-        const showRandomPopup = () => {
-            // Pick a random purchase
-            const randomPurchase = MOCK_PURCHASES[Math.floor(Math.random() * MOCK_PURCHASES.length)];
-            setCurrentPurchase(randomPurchase);
-            setIsVisible(true);
+  useEffect(() => {
+    const show = () => {
+      setPopup({ name: random(NAMES), city: random(CITIES), product: random(PRODUCTS), time: random(TIMES) });
+      setVisible(true);
+      setTimeout(() => setVisible(false), 4500);
+    };
+    const initial = setTimeout(show, 6000);
+    const interval = setInterval(show, 18000);
+    return () => { clearTimeout(initial); clearInterval(interval); };
+  }, []);
 
-            // Hide after 5 seconds
-            setTimeout(() => {
-                setIsVisible(false);
-            }, 5000);
-        };
+  if (!popup) return null;
 
-        // Initial delay before first popup
-        const initialTimer = setTimeout(() => {
-            showRandomPopup();
-        }, 10000); // Wait 10 seconds initially
-
-        // Repeat every 20-40 seconds
-        const intervalTimer = setInterval(() => {
-            showRandomPopup();
-        }, Math.floor(Math.random() * 20000) + 20000);
-
-        return () => {
-            clearTimeout(initialTimer);
-            clearInterval(intervalTimer);
-        };
-    }, []);
-
-    if (!currentPurchase) return null;
-
-    return (
-        <div
-            className={`fixed bottom-4 left-4 sm:bottom-8 sm:left-8 z-50 transition-all duration-500 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'
-                }`}
-        >
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-4 pr-12 relative overflow-hidden group hover:scale-105 transition-transform max-w-xs">
-                {/* Decorative Side Bar */}
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-teal-500"></div>
-
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-teal-50 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
-                    🛍️
-                </div>
-
-                <div>
-                    <p className="text-sm text-gray-800">
-                        <span className="font-bold text-blue-600">{currentPurchase.name}</span> purchased
-                    </p>
-                    <p className="font-extrabold text-gray-900 line-clamp-1">{currentPurchase.product}</p>
-                    <p className="text-xs text-teal-600 font-medium mt-0.5">{currentPurchase.time}</p>
-                </div>
-
-                {/* Close Button */}
-                <button
-                    onClick={() => setIsVisible(false)}
-                    className="absolute right-2 top-2 p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors opacity-0 group-hover:opacity-100"
-                >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+  return (
+    <div
+      className="fixed bottom-24 left-4 z-50 transition-all duration-500 max-w-xs"
+      style={{ transform: visible ? 'translateY(0)' : 'translateY(120px)', opacity: visible ? 1 : 0, pointerEvents: visible ? 'auto' : 'none' }}
+    >
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-4 flex items-center gap-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(65,105,225,0.1)' }}>
+          <span className="material-symbols-outlined text-base select-none" style={{ color: '#4169e1' }}>shopping_bag</span>
         </div>
-    );
+        <div className="min-w-0">
+          <p className="text-xs font-extrabold text-slate-900 truncate">{popup.name} from {popup.city}</p>
+          <p className="text-xs text-slate-500 truncate">bought <span className="font-bold text-slate-800">{popup.product}</span></p>
+          <p className="text-[10px] text-slate-400 mt-0.5">{popup.time}</p>
+        </div>
+        <button onClick={() => setVisible(false)} className="flex-shrink-0 text-slate-300 hover:text-slate-500 transition-colors ml-1">
+          <span className="material-symbols-outlined text-sm select-none">close</span>
+        </button>
+      </div>
+    </div>
+  );
 }
