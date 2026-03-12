@@ -12,7 +12,7 @@ const Supplier = sequelize.define('Supplier', {
     allowNull: false
   },
   type: {
-    type: DataTypes.ENUM('aliexpress', 'cj_dropship', 'indiamart', 'custom'),
+    type: DataTypes.ENUM('vfulfill', 'baapstore', 'eprolo', 'printrove', 'qikink', 'custom'),
     allowNull: false
   },
   apiEndpoint: {

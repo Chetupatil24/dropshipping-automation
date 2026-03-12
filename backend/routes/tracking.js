@@ -210,47 +210,100 @@ router.post('/webhook/vfulfill', async (req, res) => {
 });
 
 /**
- * POST /api/tracking/webhook/cj
- * Webhook endpoint for CJ Dropshipping to send tracking updates
+ * POST /api/tracking/webhook/printrove
+ * Webhook endpoint for Printrove to send tracking updates
  */
-router.post('/webhook/cj', async (req, res) => {
+router.post('/webhook/printrove', async (req, res) => {
     try {
-        const { orderNumber, status, trackingNumber } = req.body;
+        const { order_id, awb_number, status } = req.body;
 
-        logger.info('Received CJ webhook', {
-            orderNumber,
-            status,
-            trackingNumber
-        });
+        logger.info('Received Printrove webhook', { order_id, awb_number, status });
 
-        // Find order by CJ order number
         const order = await Order.findOne({
-            where: { fulfillmentOrderId: orderNumber }
+            where: { fulfillmentOrderId: order_id }
         });
 
         if (!order) {
-            logger.warn(`Webhook received for unknown CJ order: ${orderNumber}`);
+            logger.warn(`Webhook received for unknown Printrove order: ${order_id}`);
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        // Update tracking immediately
-        await trackingService.updateOrderTracking(order.id);
+        if (awb_number) {
+            await order.update({
+                trackingNumber: awb_number,
+                fulfillmentStatus: status || order.fulfillmentStatus
+            });
+        }
 
-        res.status(200).json({
-            success: true,
-            message: 'Webhook processed successfully'
-        });
+        res.status(200).json({ success: true, message: 'Webhook processed successfully' });
 
     } catch (error) {
-        logger.error('CJ webhook error', {
-            error: error.message,
-            body: req.body
-        });
+        logger.error('Printrove webhook error', { error: error.message, body: req.body });
+        res.status(500).json({ success: false, error: 'Webhook processing failed' });
+    }
+});
 
-        res.status(500).json({
-            success: false,
-            error: 'Webhook processing failed'
-        });
+/**
+ * POST /api/tracking/webhook/baapstore
+ * Webhook endpoint for Baap Store
+ */
+router.post('/webhook/baapstore', async (req, res) => {
+    try {
+        const { order_id, tracking_number, status } = req.body;
+
+        logger.info('Received Baap Store webhook', { order_id, tracking_number, status });
+
+        const order = await Order.findOne({ where: { fulfillmentOrderId: order_id } });
+
+        if (!order) {
+            logger.warn(`Webhook received for unknown Baap Store order: ${order_id}`);
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        if (tracking_number) {
+            await order.update({
+                trackingNumber: tracking_number,
+                fulfillmentStatus: status || order.fulfillmentStatus
+            });
+        }
+
+        res.status(200).json({ success: true, message: 'Webhook processed successfully' });
+
+    } catch (error) {
+        logger.error('Baap Store webhook error', { error: error.message, body: req.body });
+        res.status(500).json({ success: false, error: 'Webhook processing failed' });
+    }
+});
+
+/**
+ * POST /api/tracking/webhook/eprolo
+ * Webhook endpoint for Eprolo
+ */
+router.post('/webhook/eprolo', async (req, res) => {
+    try {
+        const { orderId, trackingNumber, status } = req.body;
+
+        logger.info('Received Eprolo webhook', { orderId, trackingNumber, status });
+
+        const order = await Order.findOne({ where: { fulfillmentOrderId: orderId } });
+
+        if (!order) {
+            logger.warn(`Webhook received for unknown Eprolo order: ${orderId}`);
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        if (trackingNumber) {
+            await order.update({
+                trackingNumber,
+                fulfillmentStatus: status || order.fulfillmentStatus
+            });
+        }
+
+        res.status(200).json({ success: true, message: 'Webhook processed successfully' });
+
+    } catch (error) {
+        logger.error('Eprolo webhook error', { error: error.message, body: req.body });
+        res.status(500).json({ success: false, error: 'Webhook processing failed' });
     }
 });
 

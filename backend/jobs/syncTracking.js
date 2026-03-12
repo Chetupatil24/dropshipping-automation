@@ -1,6 +1,5 @@
 const { Order } = require('../models');
 const logger = require('../utils/logger');
-const cjdropship = require('../integrations/suppliers/cjdropship');
 
 // Import vFulfill
 let vfulfill;
@@ -39,11 +38,8 @@ module.exports = async (job) => {
                     if (vfulfill) {
                         trackingData = await vfulfill.getOrderStatus(order.supplierOrderId);
                     }
-                } else if (order.supplierOrderId.startsWith('CJ')) {
-                    // CJ Dropshipping order
-                    trackingData = await cjdropship.getOrderStatus(order.supplierOrderId);
                 }
-                // Removed AliExpress support (not in use)
+                // Other vendors (Printrove, Qikink, BaapStore, Eprolo) use webhook-based tracking
 
                 if (trackingData && trackingData.trackingNumber) {
                     // Update order with tracking info

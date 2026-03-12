@@ -41,6 +41,22 @@ class VendorConfig {
                 enabled: process.env.VENDORBOAT_ENABLED === 'true',
                 authType: 'apikey',
                 timeout: 30000
+            },
+            baapstore: {
+                name: 'Baap Store',
+                apiKey: process.env.BAAP_STORE_API_KEY,
+                baseUrl: process.env.BAAP_STORE_BASE_URL || 'https://baapstore.com/api/v1',
+                enabled: process.env.BAAP_STORE_ENABLED === 'true',
+                authType: 'bearer',
+                timeout: 30000
+            },
+            eprolo: {
+                name: 'Eprolo',
+                apiKey: process.env.EPROLO_API_KEY,
+                baseUrl: process.env.EPROLO_BASE_URL || 'https://openapi.eprolo.com',
+                enabled: process.env.EPROLO_ENABLED === 'true',
+                authType: 'bearer',
+                timeout: 30000
             }
         };
     }
@@ -90,10 +106,11 @@ class VendorConfig {
                 };
 
             case 'bearer':
-                // Generic Bearer Token
+                // Generic Bearer Token (Baap Store, Eprolo)
                 return {
-                    'Authorization': `Bearer ${config.apiToken}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${config.apiKey || config.apiToken}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 };
 
             case 'printrove':

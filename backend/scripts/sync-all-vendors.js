@@ -4,9 +4,10 @@
  *
  * Usage:
  *   node scripts/sync-all-vendors.js              # sync all active vendors
- *   node scripts/sync-all-vendors.js cj            # CJ only
  *   node scripts/sync-all-vendors.js printrove     # Printrove only
- *   node scripts/sync-all-vendors.js cj 200        # CJ, 200 products
+ *   node scripts/sync-all-vendors.js baapstore     # Baap Store only
+ *   node scripts/sync-all-vendors.js eprolo        # Eprolo only
+ *   node scripts/sync-all-vendors.js qikink        # Qikink only
  */
 require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
 const { Product, Supplier, sequelize: seq } = require('../models');
@@ -46,85 +47,6 @@ async function upsertProduct(data, supplierId) {
     return { product, created };
 }
 
-// ─── CJ Dropshipping Sync ───────────────────────────────────────────────────
-
-async function syncCJ(maxProducts) {
-    console.log('\n🔵 Starting CJ Dropshipping sync...');
-    const cjService = require('../services/cjDropshippingService');
-
-    let supplier = await Supplier.findOne({ where: { name: 'CJ Dropshipping' } });
-    if (!supplier) {
-        supplier = await Supplier.create({
-            name: 'CJ Dropshipping', type: 'cj_dropship',
-            apiKey: process.env.CJ_API_KEY, isActive: true,
-            settings: { baseUrl: 'https://developers.cjdropshipping.com/api2.0/v1' }
-        });
-    }
-
-    const existingSlugs = new Set(
-        (await Product.findAll({ attributes: ['slug'], raw: true })).map(p => p.slug)
-    );
-
-    let synced = 0, failed = 0;
-    const pages = Math.ceil(maxProducts / 50);
-
-    for (let page = 1; page <= pages && synced < maxProducts; page++) {
-        if (page > 1) await sleep(1500);
-        let products;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-            try {
-                products = await cjService.getProducts({ page, pageSize: 50 });
-                break;
-            } catch (err) {
-                if (attempt === 3) { console.log(`  ❌ Page ${page} failed: ${err.message}`); products = null; }
-                else await sleep(3000 * attempt);
-            }
-        }
-        if (!products?.length) continue;
-
-        for (const p of products) {
-            if (synced >= maxProducts) break;
-            try {
-                await sleep(1200); // CJ rate limit: 1 req/sec on detail endpoint
-                const detail = await cjService.getProductDetail(p.pid || p.productId);
-                if (!detail) continue;
-
-                const baseSlug = slugify(detail.productNameEn || detail.productName || p.productName);
-                const slug = uniqueSlug(baseSlug, existingSlugs);
-
-                const usdPrice = parseFloat(detail.sellPrice || detail.productPrice || p.productPrice || 1);
-                const images = (detail.productImageSet || []).map(img => img.imageUrl || img).filter(Boolean);
-
-                await upsertProduct({
-                    name: detail.productNameEn || detail.productName || p.productName,
-                    slug,
-                    description: detail.productDescEn || detail.description || '',
-                    price: usdPrice,
-                    costPrice: usdPrice,
-                    compareAtPrice: null,
-                    images,
-                    category: detail.categoryName || detail.category || 'General',
-                    sku: `CJ-${detail.pid || detail.productSku || p.pid}`,
-                    supplierProductId: `cj_${detail.pid || p.pid}`,
-                    vendor_id: 'cj',
-                    stock: parseInt(detail.inventoryTotal || detail.inventory || 100),
-                    isActive: true,
-                    tags: [detail.categoryName, 'cj-dropshipping'].filter(Boolean),
-                    dimensions: { cjPid: detail.pid, variants: detail.variants || [] },
-                    lastSyncedAt: new Date()
-                }, supplier.id);
-                synced++;
-                if (synced % 10 === 0) process.stdout.write(`  ✅ CJ: ${synced} synced...\r`);
-            } catch (err) {
-                failed++;
-                if (process.env.NODE_ENV === 'development') console.log(`  ⚠️ CJ product error: ${err.message}`);
-            }
-        }
-    }
-    console.log(`\n  ✅ CJ Dropshipping: ${synced} synced, ${failed} failed`);
-    return synced;
-}
-
 // ─── Printrove Sync ─────────────────────────────────────────────────────────
 
 async function syncPrintrove(maxProducts) {
@@ -135,7 +57,7 @@ async function syncPrintrove(maxProducts) {
     let supplier = await Supplier.findOne({ where: { name: 'Printrove' } });
     if (!supplier) {
         supplier = await Supplier.create({
-            name: 'Printrove', type: 'custom',
+            name: 'Printrove', type: 'printrove',
             isActive: true,
             settings: { baseUrl: 'https://api.printrove.com/api/external', vendorType: 'printrove' }
         });
@@ -164,7 +86,7 @@ async function syncPrintrove(maxProducts) {
             hasMore = !!links.next && products.length === perPage;
 
             if (products.length === 0) {
-                console.log('  ℹ️  Printrove: no products in catalog yet (add products at printrove.com first)');
+                console.log('  ℹ️  Printrove: no products in catalog yet');
                 break;
             }
 
@@ -210,6 +132,160 @@ async function syncPrintrove(maxProducts) {
     return synced;
 }
 
+// ─── Baap Store Sync ─────────────────────────────────────────────────────────
+
+async function syncBaapStore(maxProducts) {
+    if (!process.env.BAAP_STORE_API_KEY) {
+        console.log('\n⏭️  Baap Store: Skipped (no API key — add BAAP_STORE_API_KEY to .env)');
+        return 0;
+    }
+    console.log('\n🟢 Starting Baap Store sync...');
+    const baapstoreAdapter = require('../services/vendors/baapstoreAdapter');
+
+    let supplier = await Supplier.findOne({ where: { name: 'Baap Store' } });
+    if (!supplier) {
+        supplier = await Supplier.create({
+            name: 'Baap Store', type: 'baapstore',
+            apiKey: process.env.BAAP_STORE_API_KEY,
+            isActive: true,
+            settings: { baseUrl: 'https://baapstore.com/api/v1', vendorType: 'baapstore' }
+        });
+    }
+
+    const existingSlugs = new Set(
+        (await Product.findAll({ attributes: ['slug'], raw: true })).map(p => p.slug)
+    );
+
+    let synced = 0, failed = 0;
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && synced < maxProducts) {
+        try {
+            const products = await baapstoreAdapter.getProducts({ page, limit: 50 });
+            if (!products || products.length === 0) { hasMore = false; break; }
+            hasMore = products.length === 50;
+
+            for (const p of products) {
+                if (synced >= maxProducts) break;
+                try {
+                    const baseSlug = slugify(p.name || p.product_name);
+                    const slug = uniqueSlug(baseSlug, existingSlugs);
+                    const price = parseFloat(p.price || p.selling_price || 0);
+
+                    await upsertProduct({
+                        name: p.name || p.product_name,
+                        slug,
+                        description: p.description || '',
+                        price,
+                        costPrice: parseFloat(p.purchase_price || price * 0.4),
+                        compareAtPrice: null,
+                        images: (p.images || []).map(img => img.url || img).filter(Boolean),
+                        category: p.category || 'General',
+                        sku: `BS-${p.sku || p.id}`,
+                        supplierProductId: `baapstore_${p.id || p.product_id}`,
+                        vendor_id: 'baapstore',
+                        vendor_sku: p.sku || String(p.id),
+                        stock: parseInt(p.stock || p.quantity || 100),
+                        isActive: true,
+                        tags: ['baapstore', p.category].filter(Boolean),
+                        dimensions: { variants: p.variants || [] },
+                        lastSyncedAt: new Date()
+                    }, supplier.id);
+                    synced++;
+                } catch (err) {
+                    failed++;
+                    if (process.env.NODE_ENV === 'development') console.log(`  ⚠️ Baap Store product error: ${err.message}`);
+                }
+            }
+            page++;
+            await sleep(500);
+        } catch (err) {
+            console.log(`  ❌ Baap Store page ${page} error: ${err.message}`);
+            break;
+        }
+    }
+    console.log(`  ✅ Baap Store: ${synced} synced, ${failed} failed`);
+    return synced;
+}
+
+// ─── Eprolo Sync ─────────────────────────────────────────────────────────────
+
+async function syncEprolo(maxProducts) {
+    if (!process.env.EPROLO_API_KEY) {
+        console.log('\n⏭️  Eprolo: Skipped (no API key — add EPROLO_API_KEY to .env)');
+        return 0;
+    }
+    console.log('\n🔷 Starting Eprolo sync...');
+    const eproloAdapter = require('../services/vendors/eproloAdapter');
+
+    let supplier = await Supplier.findOne({ where: { name: 'Eprolo' } });
+    if (!supplier) {
+        supplier = await Supplier.create({
+            name: 'Eprolo', type: 'eprolo',
+            apiKey: process.env.EPROLO_API_KEY,
+            isActive: true,
+            settings: { baseUrl: 'https://openapi.eprolo.com', vendorType: 'eprolo' }
+        });
+    }
+
+    const existingSlugs = new Set(
+        (await Product.findAll({ attributes: ['slug'], raw: true })).map(p => p.slug)
+    );
+
+    let synced = 0, failed = 0;
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && synced < maxProducts) {
+        try {
+            const products = await eproloAdapter.getProducts({ page, pageSize: 50 });
+            if (!products || products.length === 0) { hasMore = false; break; }
+            hasMore = products.length === 50;
+
+            for (const p of products) {
+                if (synced >= maxProducts) break;
+                try {
+                    const baseSlug = slugify(p.productTitle || p.name);
+                    const slug = uniqueSlug(baseSlug, existingSlugs);
+                    const price = parseFloat(p.price || p.sellPrice || 0);
+
+                    await upsertProduct({
+                        name: p.productTitle || p.name,
+                        slug,
+                        description: p.description || '',
+                        price,
+                        costPrice: parseFloat(p.costPrice || price * 0.4),
+                        compareAtPrice: null,
+                        images: (p.images || p.productImages || []).map(img => img.imageUrl || img.url || img).filter(Boolean),
+                        category: p.categoryName || p.category || 'General',
+                        sku: `EP-${p.sku || p.productId}`,
+                        supplierProductId: `eprolo_${p.productId || p.id}`,
+                        vendor_id: 'eprolo',
+                        vendor_sku: p.sku || String(p.productId),
+                        stock: parseInt(p.stock || p.inventory || 100),
+                        isActive: true,
+                        tags: ['eprolo', p.categoryName].filter(Boolean),
+                        dimensions: { variants: p.variants || [] },
+                        lastSyncedAt: new Date()
+                    }, supplier.id);
+                    synced++;
+                } catch (err) {
+                    failed++;
+                    if (process.env.NODE_ENV === 'development') console.log(`  ⚠️ Eprolo product error: ${err.message}`);
+                }
+            }
+            page++;
+            await sleep(500);
+        } catch (err) {
+            console.log(`  ❌ Eprolo page ${page} error: ${err.message}`);
+            break;
+        }
+    }
+    console.log(`  ✅ Eprolo: ${synced} synced, ${failed} failed`);
+    return synced;
+}
+
 // ─── Vfulfill Sync (placeholder — needs API key) ────────────────────────────
 
 async function syncVfulfill() {
@@ -218,17 +294,6 @@ async function syncVfulfill() {
         return 0;
     }
     console.log('\n🟡 Vfulfill sync: coming soon once API key received');
-    return 0;
-}
-
-// ─── Seasonsway Sync (placeholder) ──────────────────────────────────────────
-
-async function syncSeasonsway() {
-    if (!process.env.SEASONSWAY_API_KEY) {
-        console.log('⏭️  Seasonsway: Skipped (no API key — email seller@seasonsway.com)');
-        return 0;
-    }
-    console.log('🟠 Seasonsway sync: coming soon once API key received');
     return 0;
 }
 
@@ -246,18 +311,19 @@ async function main() {
 
     const totals = {};
 
-    if (target === 'all' || target === 'cj') {
-        totals.cj = await syncCJ(maxPerVendor);
-    }
     if (target === 'all' || target === 'printrove') {
         totals.printrove = await syncPrintrove(maxPerVendor);
     }
+    if (target === 'all' || target === 'baapstore') {
+        totals.baapstore = await syncBaapStore(maxPerVendor);
+    }
+    if (target === 'all' || target === 'eprolo') {
+        totals.eprolo = await syncEprolo(maxPerVendor);
+    }
     if (target === 'all') {
         totals.vfulfill = await syncVfulfill();
-        totals.seasonsway = await syncSeasonsway();
     }
 
-    // Final count
     const totalInDB = await Product.count({ where: { isActive: true } });
     console.log('\n╔══════════════════════════════════════════╗');
     console.log('║              Sync Complete                ║');

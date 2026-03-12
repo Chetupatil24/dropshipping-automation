@@ -52,12 +52,12 @@ class EnvironmentValidator {
     // Validate supplier integrations
     validateSuppliers() {
         const suppliers = {
-            'ALIEXPRESS_API_KEY': 'AliExpress integration',
-            'ALIEXPRESS_API_SECRET': 'AliExpress integration',
-            'CJ_DROPSHIP_API_KEY': 'CJ Dropshipping integration',
-            'CJ_DROPSHIP_EMAIL': 'CJ Dropshipping authentication',
-            'CJ_DROPSHIP_PASSWORD': 'CJ Dropshipping authentication',
-            'INDIAMART_API_KEY': 'IndiaMART inquiry fetching'
+            'QIKINK_API_KEY': 'Qikink POD integration',
+            'QIKINK_API_SECRET': 'Qikink POD integration',
+            'PRINTROVE_EMAIL': 'Printrove POD integration',
+            'PRINTROVE_PASSWORD': 'Printrove POD authentication',
+            'BAAP_STORE_API_KEY': 'Baap Store integration',
+            'EPROLO_API_KEY': 'Eprolo integration'
         };
 
         const missingSuppliers = [];

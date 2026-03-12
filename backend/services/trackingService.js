@@ -1,5 +1,4 @@
 const vFulfillService = require('./vFulfillService');
-const cjDropshippingService = require('./cjDropshippingService');
 const { Order, OrderTrackingHistory } = require('../models');
 const emailService = require('./emailService');
 const logger = require('../utils/logger');
@@ -25,10 +24,9 @@ class TrackingService {
             // Get tracking from appropriate fulfillment service
             if (order.fulfillmentService === 'vfulfill') {
                 tracking = await vFulfillService.getTracking(order.fulfillmentOrderId);
-            } else if (order.fulfillmentService === 'cj') {
-                tracking = await cjDropshippingService.getTracking(order.fulfillmentOrderId);
             } else {
-                logger.warn(`Unknown fulfillment service: ${order.fulfillmentService}`);
+                // For Printrove, Qikink, Baap Store, Eprolo — tracking comes via webhook or adapter
+                logger.info(`Tracking for ${order.fulfillmentService} handled by vendor adapter`);
                 return null;
             }
 
