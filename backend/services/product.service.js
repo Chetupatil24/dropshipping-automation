@@ -6,7 +6,7 @@ class ProductService {
   // Get all products with filtering and pagination
   async getProducts(filters = {}, pagination = {}) {
     try {
-      const { page = 1, limit = 20, category, search, isActive = true, vendor, sort, maxPrice } = { ...filters, ...pagination };
+      const { page = 1, limit = 24, category, search, isActive = true, vendor, sort, maxPrice } = { ...filters, ...pagination };
       const offset = (page - 1) * limit;
 
       const where = { isActive };

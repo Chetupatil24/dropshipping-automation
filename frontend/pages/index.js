@@ -37,8 +37,8 @@ export default function Home() {
     (async () => {
       try {
         const [allRes, featRes] = await Promise.all([
-          productsAPI.getAll({ limit: 12, sort: 'createdAt:desc' }),
-          productsAPI.getAll({ limit: 6, sort: 'featured' }),
+          productsAPI.getAll({ limit: 16, sort: 'createdAt:desc' }),
+          productsAPI.getAll({ limit: 8, sort: 'featured' }),
         ]);
         setProducts(allRes.data?.products || []);
         setFeatured(featRes.data?.products || []);

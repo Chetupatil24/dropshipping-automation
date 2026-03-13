@@ -9,7 +9,7 @@ import Navbar from '../components/Navbar';
 import SiteFooter from '../components/SiteFooter';
 import BottomNav from '../components/BottomNav';
 
-const LIMIT = 12;
+const LIMIT = 24;
 
 const VENDOR_TABS = [
   { id: '', label: 'All Products', icon: 'grid_view' },
