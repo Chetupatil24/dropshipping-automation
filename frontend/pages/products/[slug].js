@@ -10,7 +10,6 @@ import SiteFooter from '../../components/SiteFooter';
 import BottomNav from '../../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
-const toMRP = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
 
 export default function ProductDetail() {
   const router = useRouter();
@@ -51,8 +50,6 @@ export default function ProductDetail() {
     ? product.images
     : [product.imageUrl || product.image || 'https://placehold.co/600x800?text=No+Image'];
   const price = toINR(product.price);
-  const mrp = toMRP(product.price);
-  const disc = Math.round((1 - price / mrp) * 100);
 
   const handleAddToCart = () => {
     for (let i = 0; i < qty; i++) addToCart(product);
@@ -104,7 +101,6 @@ export default function ProductDetail() {
             <div className="lg:col-span-5 flex flex-col gap-7">
               <section>
                 <div className="flex items-center gap-2 mb-3">
-                  {disc > 5 && <span className="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold uppercase tracking-widest rounded">-{disc}% OFF</span>}
                   <div className="flex text-yellow-400">
                     {[1,2,3,4,5].map(s => <span key={s} className="material-symbols-outlined text-sm fill-1 select-none">star</span>)}
                   </div>
@@ -114,8 +110,6 @@ export default function ProductDetail() {
                 {product.category && <p className="text-slate-500 font-medium text-sm mb-4">{product.category}</p>}
                 <div className="flex items-baseline gap-4 mt-4">
                   <span className="text-3xl font-bold text-slate-900">₹{price.toLocaleString('en-IN')}</span>
-                  <span className="text-lg text-slate-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
-                  {disc > 5 && <span className="text-sm font-bold text-green-600">Save ₹{(mrp - price).toLocaleString('en-IN')}</span>}
                 </div>
               </section>
 

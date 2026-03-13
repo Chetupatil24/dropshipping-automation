@@ -10,7 +10,6 @@ import SiteFooter from '../components/SiteFooter';
 import BottomNav from '../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
-const toMRP  = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
 
 export default function SearchPage() {
   const router = useRouter();
@@ -126,8 +125,6 @@ export default function SearchPage() {
               {products.map(p => {
                 const img = Array.isArray(p.images) ? p.images[0] : (p.imageUrl || p.image || '');
                 const price = toINR(p.price);
-                const mrp   = toMRP(p.price);
-                const disc  = Math.round((1 - price / mrp) * 100);
                 const wishlisted = isWishlisted ? isWishlisted(p.id) : false;
                 return (
                   <div key={p.id} className="product-card group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
@@ -135,7 +132,6 @@ export default function SearchPage() {
                       <Link href={`/products/${p.slug || p.id}`} className="block w-full h-full no-underline">
                         <img src={img || 'https://placehold.co/300x400?text=No+Image'} alt={p.name} className="product-image w-full h-full object-cover transition-transform duration-500" onError={e => { e.target.src = 'https://placehold.co/300x400?text=No+Image'; }} />
                       </Link>
-                      {disc > 5 && <span className="absolute top-2 left-2 px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">-{disc}%</span>}
                       <button onClick={() => { const added = toggleWishlist ? toggleWishlist(p) : false; toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist'); }}
                         className={`absolute top-2 right-2 w-8 h-8 bg-white rounded-full shadow flex items-center justify-center transition-colors ${wishlisted ? 'text-red-500' : 'text-slate-400 hover:text-red-400'}`}>
                         <span className={`material-symbols-outlined text-sm select-none ${wishlisted ? 'fill-1' : ''}`}>favorite</span>
@@ -154,7 +150,6 @@ export default function SearchPage() {
                       </Link>
                       <div className="flex items-baseline gap-2">
                         <span className="font-extrabold text-slate-900 text-sm">₹{price.toLocaleString('en-IN')}</span>
-                        <span className="text-xs text-slate-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
                   </div>

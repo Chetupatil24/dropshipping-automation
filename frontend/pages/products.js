@@ -10,7 +10,6 @@ import SiteFooter from '../components/SiteFooter';
 import BottomNav from '../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
-const toMRP = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
 const LIMIT = 12;
 
 
@@ -185,14 +184,11 @@ export default function Products() {
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
                   {products.map((p) => {
                     const price = toINR(p.price);
-                    const mrp = toMRP(p.price);
-                    const disc = Math.round((1 - price / mrp) * 100);
                     const img = Array.isArray(p.images) ? p.images[0] : (p.imageUrl || p.image || '');
                     return (
                       <div key={p.id} className="product-card group cursor-pointer">
                         <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 rounded-xl mb-3">
                           <img src={img || 'https://placehold.co/400x600?text=No+Image'} alt={p.name} className="product-image w-full h-full object-cover transition-transform duration-700 ease-in-out" onError={e => { e.target.src = 'https://placehold.co/400x600?text=No+Image'; }} />
-                          {disc > 5 && <span className="absolute top-3 left-3 bg-primary text-white text-[10px] font-black px-2 py-0.5 uppercase tracking-wide rounded">-{disc}%</span>}
                           <div className="quick-add absolute inset-x-3 bottom-3 opacity-0 transform translate-y-3 transition-all duration-300">
                             <button onClick={() => { addToCart(p); toast.success('Added!'); }} className="w-full bg-white text-slate-900 py-2.5 rounded-lg font-bold text-xs hover:bg-primary hover:text-white transition-colors shadow-xl">ADD TO CART</button>
                           </div>
@@ -204,7 +200,6 @@ export default function Products() {
                         <div className="flex items-center justify-between">
                           <div>
                             <span className="font-bold text-slate-900">₹{price.toLocaleString('en-IN')}</span>
-                            <span className="text-xs text-slate-400 line-through ml-1">₹{mrp.toLocaleString('en-IN')}</span>
                           </div>
                         </div>
                       </div>

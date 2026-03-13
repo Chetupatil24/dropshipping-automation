@@ -7,7 +7,6 @@ import SiteFooter from '../components/SiteFooter';
 import BottomNav from '../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
-const toMRP = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
 
 export default function WishlistPage() {
   const { wishlist = [], removeFromWishlist, addToCart, getCartCount } = useStore();
@@ -44,13 +43,10 @@ export default function WishlistPage() {
               {wishlist.map((item) => {
                 const img = Array.isArray(item.images) ? item.images[0] : (item.imageUrl || item.image || '');
                 const price = toINR(item.price);
-                const mrp = toMRP(item.price);
-                const disc = Math.round((1 - price / mrp) * 100);
                 return (
                   <div key={item.id} className="product-card group bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm cursor-pointer">
                     <div className="relative aspect-[3/4] overflow-hidden bg-slate-50">
                       <img src={img || 'https://placehold.co/300x400?text=No+Image'} alt={item.name} className="product-image w-full h-full object-cover transition-transform duration-500" onError={e => { e.target.src='https://placehold.co/300x400?text=No+Image'; }} />
-                      {disc > 5 && <span className="absolute top-3 left-3 px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full tracking-widest">-{disc}%</span>}
                       <button onClick={() => removeFromWishlist && (removeFromWishlist(item.id), toast.success('Removed from wishlist'))} className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full shadow flex items-center justify-center hover:text-red-500 transition-colors">
                         <span className="material-symbols-outlined text-sm text-red-500 fill-1 select-none">favorite</span>
                       </button>
@@ -66,7 +62,6 @@ export default function WishlistPage() {
                       </Link>
                       <div className="flex items-baseline gap-2">
                         <span className="font-extrabold text-slate-900 text-sm">₹{price.toLocaleString('en-IN')}</span>
-                        <span className="text-xs text-slate-400 line-through">₹{mrp.toLocaleString('en-IN')}</span>
                       </div>
                       <button onClick={() => handleMoveToCart(item)} className="mt-3 w-full py-2 rounded-lg text-white text-xs font-bold transition hover:opacity-90" style={{ backgroundColor: '#4169e1' }}>
                         Add to Cart

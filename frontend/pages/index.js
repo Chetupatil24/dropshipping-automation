@@ -10,7 +10,6 @@ import SiteFooter from '../components/SiteFooter';
 import BottomNav from '../components/BottomNav';
 
 const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
-const toMRP = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.9);
 
 const CATEGORIES = [
   { name: 'Dresses', icon: 'apparel', link: '/products?category=Lady' },
@@ -124,14 +123,11 @@ export default function Home() {
                 </div>
               )) : products.map((p) => {
                 const price = toINR(p.price);
-                const mrp = toMRP(p.price);
-                const disc = Math.round((1 - price / mrp) * 100);
                 const img = Array.isArray(p.images) ? p.images[0] : (p.imageUrl || p.image || '');
                 return (
                   <div key={p.id} className="min-w-[240px] bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group border border-slate-100 cursor-pointer">
                     <div className="relative h-64">
                       <img src={img || 'https://placehold.co/400x400?text=No+Image'} alt={p.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onError={e => { e.target.src = 'https://placehold.co/400x400?text=No+Image'; }} />
-                      {disc > 5 && <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">-{disc}%</span>}
                       <button onClick={() => handleAddToCart(p)} className="absolute bottom-2 left-2 right-2 bg-primary text-white text-xs font-bold py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all">Add to Cart</button>
                     </div>
                     <div className="p-4">
@@ -142,7 +138,6 @@ export default function Home() {
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="text-primary font-bold text-sm">&#8377;{price.toLocaleString('en-IN')}</span>
-                          <span className="text-slate-400 line-through text-xs ml-1">&#8377;{mrp.toLocaleString('en-IN')}</span>
                         </div>
                         <div className="flex items-center text-yellow-500">
                           <span className="material-symbols-outlined text-[12px] fill-1 select-none">star</span>
