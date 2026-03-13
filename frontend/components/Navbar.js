@@ -20,10 +20,10 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: '/products?category=Lady', label: 'Women' },
-    { href: '/products?category=Men', label: 'Men' },
-    { href: '/products?category=Accessories', label: 'Accessories' },
     { href: '/products', label: 'All Products' },
+    { href: '/products?vendor=qikink', label: 'Qikink POD' },
+    { href: '/custom-prints', label: 'Custom Prints' },
+    { href: '/products?category=Mugs', label: 'Gifts' },
   ];
 
   return (

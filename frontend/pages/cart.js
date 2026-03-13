@@ -7,7 +7,7 @@ import Navbar from '../components/Navbar';
 import SiteFooter from '../components/SiteFooter';
 import BottomNav from '../components/BottomNav';
 
-const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
+const toINR = (price) => Math.round(parseFloat(price || 0));
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, getCartTotal, getCartCount, clearCart } = useStore();

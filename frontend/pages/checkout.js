@@ -6,7 +6,7 @@ import { useStore } from '../lib/store';
 import { paymentsAPI, ordersAPI } from '../lib/api';
 import { toast } from 'react-hot-toast';
 
-const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
+const toINR = (price) => Math.round(parseFloat(price || 0));
 
 const STEPS = ['Shipping', 'Payment', 'Review'];
 

@@ -9,7 +9,10 @@ import Navbar from '../../components/Navbar';
 import SiteFooter from '../../components/SiteFooter';
 import BottomNav from '../../components/BottomNav';
 
-const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
+const VENDOR_BADGE = {
+  qikink: { label: 'Qikink Print-on-Demand', cls: 'bg-blue-100 text-blue-700', icon: 'print' },
+  printrove: { label: 'Printrove Custom Print', cls: 'bg-purple-100 text-purple-700', icon: 'palette' },
+};
 
 export default function ProductDetail() {
   const router = useRouter();
@@ -30,10 +33,11 @@ export default function ProductDetail() {
         let res;
         try { res = await productsAPI.getBySlug(slug); }
         catch { res = await productsAPI.getById(slug); }
-        setProduct(res.data.product || res.data);
-        // load related
-        const rel = await productsAPI.getAll({ limit: 4 });
-        setRelated(rel.data.products || []);
+        const prod = res.data.product || res.data;
+        setProduct(prod);
+        // load related products from same vendor / category
+        const rel = await productsAPI.getAll({ limit: 4, category: prod.category, vendor: prod.vendor_id });
+        setRelated((rel.data.products || []).filter(p => p.id !== prod.id).slice(0, 4));
       } catch (e) { console.error(e); toast.error('Product not found'); router.push('/products'); }
       finally { setLoading(false); }
     })();
@@ -49,7 +53,8 @@ export default function ProductDetail() {
   const images = Array.isArray(product.images) && product.images.length > 0
     ? product.images
     : [product.imageUrl || product.image || 'https://placehold.co/600x800?text=No+Image'];
-  const price = toINR(product.price);
+  const price = parseFloat(product.price || 0);
+  const vb = VENDOR_BADGE[product.vendor_id];
 
   const handleAddToCart = () => {
     for (let i = 0; i < qty; i++) addToCart(product);
@@ -101,10 +106,12 @@ export default function ProductDetail() {
             <div className="lg:col-span-5 flex flex-col gap-7">
               <section>
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="flex text-yellow-400">
-                    {[1,2,3,4,5].map(s => <span key={s} className="material-symbols-outlined text-sm fill-1 select-none">star</span>)}
-                  </div>
-                  <span className="text-xs text-slate-500 font-medium">(Reviews)</span>
+                  {vb && (
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-full ${vb.cls}`}>
+                      <span className="material-symbols-outlined text-[11px] select-none">{vb.icon}</span>
+                      {vb.label}
+                    </span>
+                  )}
                 </div>
                 <h1 className="text-3xl font-extrabold text-slate-900 mb-2 leading-tight">{product.name}</h1>
                 {product.category && <p className="text-slate-500 font-medium text-sm mb-4">{product.category}</p>}
@@ -168,7 +175,7 @@ export default function ProductDetail() {
               <h3 className="text-2xl font-extrabold mb-8">You May Also Like</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {related.slice(0, 4).map((p) => {
-                  const rPrice = toINR(p.price);
+                  const rPrice = parseFloat(p.price || 0);
                   const rImg = Array.isArray(p.images) ? p.images[0] : (p.imageUrl || p.image || '');
                   return (
                     <Link key={p.id} href={`/products/${p.slug || p.id}`} className="group cursor-pointer no-underline">

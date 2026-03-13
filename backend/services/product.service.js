@@ -6,7 +6,7 @@ class ProductService {
   // Get all products with filtering and pagination
   async getProducts(filters = {}, pagination = {}) {
     try {
-      const { page = 1, limit = 20, category, search, isActive = true } = { ...filters, ...pagination };
+      const { page = 1, limit = 20, category, search, isActive = true, vendor, sort, maxPrice } = { ...filters, ...pagination };
       const offset = (page - 1) * limit;
 
       const where = { isActive };
@@ -15,20 +15,36 @@ class ProductService {
         where.category = { [Op.iLike]: `%${category}%` };
       }
 
+      if (vendor) {
+        where.vendor_id = vendor;
+      }
+
+      if (maxPrice) {
+        where.price = { [Op.lte]: parseFloat(maxPrice) };
+      }
+
       if (search) {
         where[Op.or] = [
           { name: { [Op.iLike]: `%${search}%` } },
           { description: { [Op.iLike]: `%${search}%` } },
-          { sku: { [Op.iLike]: `%${search}%` } }
+          { sku: { [Op.iLike]: `%${search}%` } },
+          { category: { [Op.iLike]: `%${search}%` } }
         ];
       }
+
+      // Sort order
+      let order = [['createdAt', 'DESC']];
+      if (sort === 'price:asc') order = [['price', 'ASC']];
+      else if (sort === 'price:desc') order = [['price', 'DESC']];
+      else if (sort === 'name:asc') order = [['name', 'ASC']];
+      else if (sort === 'featured') order = [['isFeatured', 'DESC'], ['createdAt', 'DESC']];
 
       const { count, rows } = await Product.findAndCountAll({
         where,
         limit: parseInt(limit),
         offset,
         include: [{ model: Supplier, as: 'supplier' }],
-        order: [['createdAt', 'DESC']]
+        order
       });
 
       return {

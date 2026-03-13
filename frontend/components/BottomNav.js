@@ -10,8 +10,8 @@ export default function BottomNav() {
   const items = [
     { href: '/', icon: 'home', label: 'Home' },
     { href: '/products', icon: 'grid_view', label: 'Shop' },
+    { href: '/custom-prints', icon: 'palette', label: 'Custom' },
     { href: '/wishlist', icon: 'favorite', label: 'Wishlist' },
-    { href: '/orders', icon: 'package_2', label: 'Orders' },
     { href: '/account', icon: 'person', label: 'Profile' },
   ];
 

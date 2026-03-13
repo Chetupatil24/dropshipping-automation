@@ -16,7 +16,7 @@ const TABS = [
   { id: 'security', label: 'Security', icon: 'shield' },
 ];
 
-const toINR = (usd) => Math.round(parseFloat(usd || 0) * 83 * 1.45);
+const toINR = (price) => Math.round(parseFloat(price || 0));
 
 export default function AccountPage() {
   const router = useRouter();

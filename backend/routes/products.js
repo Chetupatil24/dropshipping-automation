@@ -7,8 +7,8 @@ const { validate, createProductSchema } = require('../middleware/validation');
 // Get all products (public)
 router.get('/', async (req, res, next) => {
   try {
-    const { page, limit, category, search } = req.query;
-    const result = await productService.getProducts({ category, search }, { page, limit });
+    const { page, limit, category, search, vendor, sort, maxPrice } = req.query;
+    const result = await productService.getProducts({ category, search, vendor, sort, maxPrice }, { page, limit });
     res.json(result);
   } catch (error) {
     next(error);
